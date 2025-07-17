@@ -1,0 +1,4 @@
+/// <reference types="google.maps" />
+import { AutocompletionRequest } from '../GooglePlacesAutocomplete.types';
+declare const _default: (autocompletionRequest: AutocompletionRequest, input: string, sessionToken?: google.maps.places.AutocompleteSessionToken | undefined) => google.maps.places.AutocompletionRequest;
+export default _default;

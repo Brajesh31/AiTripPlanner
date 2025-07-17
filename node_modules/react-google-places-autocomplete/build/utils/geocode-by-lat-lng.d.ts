@@ -1,0 +1,4 @@
+/// <reference types="google.maps" />
+import { LatLng } from '../types';
+declare const geocodeByLatLng: (latLng: LatLng) => Promise<google.maps.GeocoderResult[]>;
+export default geocodeByLatLng;

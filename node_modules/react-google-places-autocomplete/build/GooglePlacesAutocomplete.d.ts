@@ -1,0 +1,4 @@
+import React from 'react';
+import GooglePlacesAutocompleteProps, { GooglePlacesAutocompleteHandle } from './GooglePlacesAutocomplete.types';
+declare const _default: React.ForwardRefExoticComponent<GooglePlacesAutocompleteProps & React.RefAttributes<GooglePlacesAutocompleteHandle>>;
+export default _default;

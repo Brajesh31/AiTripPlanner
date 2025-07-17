@@ -1,0 +1,4 @@
+/// <reference types="google.maps" />
+import { LatLng } from '../GooglePlacesAutocomplete.types';
+declare const getLatLng: (result: google.maps.GeocoderResult) => Promise<LatLng>;
+export default getLatLng;
