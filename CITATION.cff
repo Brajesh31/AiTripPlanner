@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: "AI Trip Planner"
+message: "If you use this software, please cite the repository."
+type: software
+authors:
+  - family-names: Kumar
+    given-names: Brajesh
+    affiliation: "Independent"
+repository-code: "https://github.com/brajesh31/AiTripPlanner"
+abstract: "A React and Vite travel-planning application with Firebase, Google Places, and Gemini integrations."
+keywords:
+  - React
+  - Vite
+  - travel planning
+  - generative AI
+license: MIT
+version: 0.0.0
