@@ -1,48 +1,48 @@
 # Testing and Validation Strategy
 
-## Current coverage
-The repository currently provides `npm run lint` and `npm run build`. No dedicated unit-test runner, React component suite, browser automation suite, or Firestore rules test suite was present in the inspected source tree. Lint and build are not complete application testing.
+## Current test tooling
+The repository currently defines `npm run lint` and `npm run build`. The reviewed source tree does not contain a dedicated unit, integration, or browser automation suite. A successful Vite build confirms compilation, not correct authentication, provider behavior, Firestore authorization, or accessible interactions.
 
-## Local checks
+## Baseline validation
+Run:
 ```bash
 npm ci
 npm run lint
 npm run build
+npm run preview
 ```
-The lint script uses zero warning tolerance. Fix findings rather than disabling rules broadly.
+Record Node and npm versions, commit SHA, command output, and any known lint exceptions. Do not claim a command passed unless it was run successfully.
 
-## Route testing
-| Route | Review |
-|---|---|
-| `/` | Landing content, header, call-to-action, responsive layout |
-| `/create-trip` | Inputs, validation, loading state, sign-in dialog |
-| `/my-trips` | Unauthenticated behavior, loading, empty state, saved cards |
-| `/view-trip/:tripId` | Valid ID, missing ID, nonexistent record, malformed record |
+## Route smoke tests
+Verify that `/` loads the landing page and header, `/create-trip` renders the preference form, `/view-trip/<synthetic-id>` loads a known test document or gives a clear not-found state, and `/my-trips` behaves correctly both signed out and signed in. Direct navigation and browser refresh must work on every route.
 
-Test direct navigation and refresh on nested routes after deployment.
+## Form tests
+Check empty destination, missing duration, zero/negative duration, non-integer duration, missing budget, missing traveler group, excessive destination text, and rapid repeated submission. Confirm that numeric duration state is actually stored as a number.
 
-## Authentication tests
-Test sign-in success, cancellation, provider failure, missing profile fields, and sign-out. Verify protected data cannot be accessed by editing local storage or changing a URL. Use a dedicated development OAuth client and synthetic test account.
+## OAuth tests
+Use a dedicated test account. Test success, cancellation, blocked popup, incorrect authorized origin, User Info network failure, missing profile fields, and logout. Never use a real personal access token in test evidence.
 
-## Trip creation tests
-Test missing destination, missing/negative/invalid duration, boundary values, missing budget, missing traveler group, valid input, duplicate clicks while pending, provider network errors, quota/permission errors, empty response, malformed JSON, missing fields, and Firestore save failure.
-
-The current form validation condition should be reviewed for field spelling and boolean grouping. Tests should establish explicit input bounds and prove invalid input cannot proceed.
-
-## AI response tests
-Use deterministic fixtures instead of live provider calls in every test. Cover valid JSON, fenced JSON, invalid JSON, missing hotel array, missing itinerary, wrong field casing, null values, oversized arrays, malformed URLs, and unsafe text. Validate against a schema before storage and rendering.
+## Gemini tests
+Use synthetic destinations and a restricted non-production key. Test valid JSON, malformed JSON, empty output, fenced JSON, missing hotel fields, missing itinerary, missing places array, rate limit, quota exhaustion, timeout, and provider unavailability. Validate output before Firestore writes. Keep generated content clearly marked as suggestions.
 
 ## Firestore tests
-Use a dedicated Firebase test project. Verify owner writes, owner reads, cross-user denial, unauthenticated denial, owner identity protection, invalid document rejection, missing document behavior, and permission-error UX. No Firestore rules or rules tests were present in the inspected repository.
+Use a non-production Firebase project or Emulator. Test create, list, detail, unauthorized read, spoofed email, cross-user document access, missing fields, malformed data, and deletion behavior when implemented. Client-side filters must not be treated as access control.
 
-## Responsive and accessibility tests
-Review phone, tablet, desktop, keyboard navigation, dialog focus management, form labels, input errors, screen-reader names, reduced motion, and 200% zoom.
+## Accessibility tests
+Use keyboard-only navigation, visible focus review, form label inspection, dialog focus management, screen reader review, 200% zoom, reduced motion, and small viewport checks. See [Accessibility](accessibility.md).
 
-## Provider isolation
-Mock external requests for automated component tests. Keep provider failures deterministic and avoid paid API quota during each test run. Do not log access tokens or complete itineraries.
+## Regression checklist
+- [ ] Lint command completes.
+- [ ] Production build completes.
+- [ ] All four routes render.
+- [ ] Direct route refresh works.
+- [ ] Form validation behaves correctly.
+- [ ] OAuth errors are handled safely.
+- [ ] Gemini malformed output is rejected.
+- [ ] Firestore rules prevent cross-user access.
+- [ ] Loading, empty, and failure states are understandable.
+- [ ] No secrets or private itineraries appear in logs.
+- [ ] Keyboard and responsive behavior are checked.
 
-## Future automation options
-Consider Vitest, React Testing Library, Playwright, Firebase Emulator Suite, schema validation tests, and accessibility checks after evaluating compatibility and maintenance overhead.
-
-## Test evidence
-Record commit SHA, Node/npm versions, commands, browser and viewport, test-account type (never credentials), provider environment, results, and known failures. A passing build does not verify OAuth, Gemini, Places, Firestore rules, or deployment settings.
+## Future automation
+Consider unit tests for input normalization and response validation, component tests for form and empty states, Firestore Emulator rules tests, and Playwright browser smoke tests. Add frameworks only with documented setup, scripts, and maintainable coverage goals.
