@@ -1,10 +1,10 @@
-# AI Trip Planner 🌍
+<div align="center">\n\n# 🌍 AI Trip Planner\n\n### ✈️ Plan smarter. Explore further. Travel with an AI-generated itinerary.\n\n![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black) ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white) ![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?logo=firebase&logoColor=black) ![Gemini](https://img.shields.io/badge/AI-Gemini-4285F4?logo=google&logoColor=white) ![License](https://img.shields.io/badge/License-MIT-green)\n\n**An AI-assisted travel itinerary planner built with React, Vite, Gemini, and Firebase.**\n\n[📚 Documentation](docs/README.md) · [🐛 Report a Bug](https://github.com/Brajesh31/AiTripPlanner/issues/new?template=bug_report.md) · [💡 Request a Feature](https://github.com/Brajesh31/AiTripPlanner/issues/new?template=feature_request.md)\n\n</div>
 
 AI Trip Planner is a React and Vite application that helps users create AI-generated travel itineraries from a destination, trip duration, budget category, and traveler group. The application uses Google sign-in, Gemini-generated suggestions, and Firebase Cloud Firestore to save and retrieve trip records.
 
-> **Important:** This is an itinerary suggestion tool, not a booking platform. AI-generated hotels, addresses, prices, ratings, images, opening hours, travel times, ticket costs, and safety details may be inaccurate or outdated. Verify important information with official providers. The application does not make reservations or guarantee availability.
+> ⚠️ **Important:** This is an itinerary suggestion tool, not a booking platform. AI-generated hotels, addresses, prices, ratings, images, opening hours, travel times, ticket costs, and safety details may be inaccurate or outdated. Verify important information with official providers. The application does not make reservations or guarantee availability.
 
-## Current capabilities
+## ✨ What the application currently does
 
 | Capability | Current implementation |
 |---|---|
@@ -20,7 +20,7 @@ AI Trip Planner is a React and Vite application that helps users create AI-gener
 | Places autocomplete | Package imported, but current field is a normal text input |
 | First-party backend API | Not implemented |
 
-## Technology stack
+## 🧰 Technology stack
 
 - **Frontend:** React 18 and JSX
 - **Build:** Vite 5
@@ -34,7 +34,7 @@ AI Trip Planner is a React and Vite application that helps users create AI-gener
 - **Icons and feedback:** Lucide React, React Icons, React Hot Toast
 - **Hosting configuration:** Vercel SPA rewrite
 
-## Getting started
+## 🚀 Getting started
 
 ### Prerequisites
 
@@ -87,7 +87,7 @@ npm run dev
 
 Open the local URL printed by Vite, commonly `http://localhost:5173`.
 
-## Available scripts
+## 📜 Available scripts
 
 | Command | Purpose |
 |---|---|
@@ -103,7 +103,7 @@ npm run lint
 npm run build
 ```
 
-## Application routes
+## 🧭 Application routes
 
 | Route | Component | Description |
 |---|---|---|
@@ -112,7 +112,7 @@ npm run build
 | `/view-trip/:tripId` | `ViewTrip` | Read and render one saved trip |
 | `/my-trips` | `MyTrips` | List saved trips for the cached profile |
 
-## Project structure
+## 🗂️ Project structure
 
 ```text
 AiTripPlanner/
@@ -144,7 +144,7 @@ AiTripPlanner/
 └── index.html
 ```
 
-## How trip generation works
+## 🔄 How trip generation works
 
 1. The user opens Create Trip and enters destination, duration, budget, and traveler category.
 2. The app checks for a cached Google profile in localStorage.
@@ -159,7 +159,7 @@ AiTripPlanner/
 
 This describes the current client implementation. It is not a production-grade identity or authorization design.
 
-## Security and deployment warnings
+## 🚨 Security and deployment warnings
 
 The repository has important production hardening requirements:
 
@@ -173,7 +173,7 @@ The repository has important production hardening requirements:
 
 Read [Security](docs/security.md), [Authentication](docs/authentication.md), [Firestore Data Model](docs/firestore-data-model.md), and [AI Output Contract](docs/ai-output-contract.md).
 
-## Testing and validation
+## 🧪 Testing and validation
 
 The project includes ESLint and a Vite production build. A dedicated unit, integration, or browser automation suite was not present in the source tree reviewed for this documentation.
 
@@ -186,7 +186,7 @@ npm run preview
 
 Manually check all routes, OAuth behavior, Firestore permissions, generation errors, malformed AI output, mobile layouts, keyboard navigation, and direct route refresh. See [Testing](docs/testing.md).
 
-## Documentation
+## 📚 Documentation
 
 Start with [docs/README.md](docs/README.md).
 
@@ -212,19 +212,19 @@ Start with [docs/README.md](docs/README.md).
 | [Troubleshooting](docs/troubleshooting.md) | Common local and provider issues |
 | [FAQ](docs/faq.md) | Common questions |
 
-## Roadmap
+## 🛣️ Roadmap
 
 See [ROADMAP.md](ROADMAP.md) for planned architecture, security, test, and product improvements. Planned work is not current functionality.
 
-## Contributing
+## 🤝 Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Contributions should include lint/build validation, route testing, security review for provider changes, and documentation.
 
-## License
+## 📄 License
 
 Released under the [MIT License](LICENSE).
 
-## Maintainer
+## 👨‍💻 Maintainer
 
 **Brajesh Kumar**  
 GitHub: [@Brajesh31](https://github.com/Brajesh31)
