@@ -1,47 +1,41 @@
 ## Summary
+Describe the problem and the change.
 
-Describe the problem being solved, the approach, and the visible or data behavior change.
-
-## Change area
-
-- [ ] Landing page or shared header
-- [ ] Trip preference form
-- [ ] Google OAuth / identity
-- [ ] Gemini prompt or response parsing
-- [ ] Firestore data or rules
-- [ ] Places integration
-- [ ] Trip list / trip detail
-- [ ] Accessibility or responsive UI
+## Change type
+- [ ] UI / accessibility
+- [ ] Trip input validation
+- [ ] Gemini prompt or output handling
+- [ ] Authentication / identity
+- [ ] Firestore / data model / rules
+- [ ] Security / privacy
+- [ ] Deployment / CI
 - [ ] Documentation
-- [ ] Deployment / repository automation
+- [ ] Dependency maintenance
 
-## Implementation details
+## Affected routes and services
+List relevant routes, components, and provider integrations.
 
-- Routes affected:
-- Components/services affected:
-- Firestore fields or schema affected:
-- Environment variables or provider configuration changed:
-- New or changed dependencies:
+## Data and security review
+- [ ] No credentials, tokens, or private user data are included.
+- [ ] Browser-exposed Vite values are not treated as secrets.
+- [ ] Firestore ownership is enforced by rules, not client-only filters.
+- [ ] AI output is validated before storage/rendering, where applicable.
+- [ ] User profile and itinerary data are not logged.
 
 ## Validation
-
 - [ ] `npm ci` completed.
-- [ ] `npm run lint` passed.
-- [ ] `npm run build` passed.
-- [ ] Changed routes were checked directly and after refresh.
-- [ ] Loading, empty, error, and provider failure states were checked.
-- [ ] Responsive layouts were reviewed.
-- [ ] Keyboard navigation and focus behavior were reviewed.
-- [ ] Firestore ownership rules were tested if data access changed.
+- [ ] `npm run lint` completed.
+- [ ] `npm run build` completed.
+- [ ] Affected routes were tested.
+- [ ] Direct route refresh was tested.
+- [ ] Loading, empty, and error states were checked.
+- [ ] Keyboard and responsive behavior were reviewed.
+- [ ] Provider tests used non-production accounts/data.
 
-## Security and privacy
+## Screenshots / evidence
+Attach screenshots for UI changes and sanitized logs for integration changes.
 
-- [ ] No credentials or tokens were added.
-- [ ] No private profile or travel data appears in code, logs, screenshots, or fixtures.
-- [ ] Browser-exposed `VITE_*` values are not treated as secrets.
-- [ ] Firestore authorization is enforced independently of client filtering.
-- [ ] Gemini output is validated before storage/rendering.
-
-## Evidence and known limitations
-
-Describe test environment and results. Include sanitized screenshots or logs when useful. List known limitations and required deployment configuration.
+## Documentation
+- [ ] Relevant guides and README were updated.
+- [ ] Environment examples are aligned with source.
+- [ ] Known limitations and future work are identified.
