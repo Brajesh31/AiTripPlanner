@@ -1,12 +1,11 @@
-# Database and Firestore
+# 🗄️ Database and Firestore
 
-## 1. Technology
-
+## 📌 1. 🔹 Technology
 The app uses Firebase Cloud Firestore through the Firebase JavaScript SDK. Initialization is in `src/service/FirebaseConfig.jsx`. The application code reads and writes a collection named `AITrips`.
 
 This guide describes fields expected by the current components. It is not a guarantee that every model-generated record conforms to a validated schema.
 
-## 2. Collection overview
+## 📌 2. Collection overview
 
 **Collection:** `AITrips`
 
@@ -14,7 +13,7 @@ This guide describes fields expected by the current components. It is not a guar
 
 The use of a timestamp string is simple but has collision and predictability limitations. A future implementation should prefer Firestore-generated document IDs or a cryptographically strong identifier and should not rely on an ID being secret.
 
-## 3. Current document shape
+## 📌 3. Current document shape
 
 The trip creation code writes an object shaped approximately as follows:
 
@@ -37,7 +36,7 @@ The trip creation code writes an object shaped approximately as follows:
 
 The values above are illustrative only. Do not treat them as a validated contract or use real user information in documentation.
 
-## 4. Field descriptions
+## 📌 4. Field descriptions
 
 | Field | Current purpose | Notes |
 |---|---|---|
@@ -48,7 +47,7 @@ The values above are illustrative only. Do not treat them as a validated contrac
 
 The UI expects `tripData.hotel_options` to contain hotel objects and `tripData.itinerary` to contain day objects with a `best_time_to_visit` value and a `places` array.
 
-## 5. Read and write paths
+## 📌 5. Read and write paths
 
 ### Create
 `src/create-trip/index.jsx` calls `setDoc` on `doc(db, 'AITrips', docId)` after parsing the model response.
@@ -59,7 +58,7 @@ The UI expects `tripData.hotel_options` to contain hotel objects and `tripData.i
 ### Detail
 `src/view-trip/[tripId]/Index.jsx` reads a document by ID from the route parameter.
 
-## 6. Security rules are mandatory
+## 📌 6. Security rules are mandatory
 
 The frontend query filtering by email does not protect the records. A visitor can modify browser storage and call Firestore APIs directly. Firestore Security Rules must verify that:
 - the request is authenticated;
@@ -72,7 +71,7 @@ The frontend query filtering by email does not protect the records. A visitor ca
 
 The current app uses Google OAuth through a separate client library. That browser profile should not automatically be assumed to represent a Firebase Auth identity. A production design needs a coherent identity model, for example Firebase Authentication with a provider sign-in flow, or a trusted server that verifies provider identity and issues an appropriate session. Rules must be tested in the Firestore Emulator or an equivalent safe test environment.
 
-## 7. Validation and data quality
+## 📌 7. Validation and data quality
 
 The model response is parsed with JSON.parse and written to Firestore without a complete schema check. Before writing:
 - validate that the root value is a plain object;
@@ -86,14 +85,14 @@ The model response is parsed with JSON.parse and written to Firestore without a 
 
 Never use model-provided URLs, coordinates, prices, or venue information as verified facts without verification.
 
-## 8. Retention and deletion
+## 📌 8. Retention and deletion
 
 The current UI does not show a documented trip deletion or account deletion workflow. Before production use, define data retention, user access/export, record deletion, account closure behavior, backup lifecycle, and support process. See [Privacy](privacy.md).
 
-## 9. Backups and operations
+## 📌 9. Backups and operations
 
 Document the Firebase project owner, environment separation, backup strategy, restoration process, access roles, and incident owner outside public repository secrets. Test restore procedures. Do not put service account keys into Vite environment variables or browser code.
 
-## 10. Migration guidance
+## 📌 10. Migration guidance
 
 When the document contract changes, plan backward compatibility for saved trips. Add explicit schema versioning if records with multiple shapes will coexist. Migrate data with a controlled script, dry run, backup, and post-migration verification rather than assuming every historical document matches the latest model prompt.
