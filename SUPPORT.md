@@ -1,8 +1,8 @@
-# 🆘 Support and Project Help
+# Support and Project Help
 
-## Start with documentation
+## Before asking for help
 
-Read the [documentation index](docs/README.md). It covers installation, routes, architecture, Google authentication, Gemini generation, data structure, Firestore, environment setup, deployment, security, testing, accessibility, and troubleshooting.
+Start with the [documentation index](docs/README.md). It explains setup, architecture, environment configuration, AI output, authentication, Firestore, deployment, security, accessibility, testing, and troubleshooting.
 
 ## Local setup
 
@@ -10,40 +10,42 @@ Read the [documentation index](docs/README.md). It covers installation, routes, 
 git clone https://github.com/Brajesh31/AiTripPlanner.git
 cd AiTripPlanner
 npm ci
-cp .env.example .env
 npm run dev
 ```
 
-Configure the required development provider values before testing OAuth, Gemini, Places, and Firestore. Do not commit the populated `.env` file.
+Configure a local `.env` using placeholder values and a non-production provider project. See [Installation](docs/installation.md) and [Environment Configuration](docs/environment.md).
 
-## What to include in a support request
+## Information to include
 
-Include:
-- route and exact action performed;
+For a useful support request, provide:
+- route and action being performed;
 - browser and version;
 - operating system;
-- Node and npm versions;
-- commit or branch;
-- numbered reproduction steps;
-- expected and actual result;
-- relevant sanitized Console/Network errors;
-- whether the issue reproduces after a clean `npm ci`.
+- Node.js and npm versions if setup/build is involved;
+- the commit or branch;
+- exact reproduction steps;
+- expected behavior and actual behavior;
+- sanitized Console or Network error;
+- relevant script output;
+- whether the issue is reproducible with a synthetic test account.
 
-Remove tokens, API keys, email addresses where unnecessary, and private itinerary details before sharing evidence.
+Never include OAuth access tokens, API keys, service-account credentials, real user email addresses, private Firestore data, or personal itineraries.
 
-## Where to ask
+## Where to report
 
-- Use issue templates for bugs, feature requests, or documentation corrections.
-- Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting code.
-- Use [SECURITY.md](SECURITY.md) for suspected vulnerabilities. Do not report active credentials or exploits in public issues.
+- Use the GitHub issue templates for bugs, feature requests, and documentation corrections.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting changes.
+- Use [SECURITY.md](SECURITY.md) for suspected vulnerabilities. Do not disclose security problems publicly.
 
-## Known product boundaries
+## Known project boundaries
 
-AI Trip Planner produces itinerary suggestions. It does not reserve hotels, confirm live availability, sell tickets, or process payments. AI-generated prices, ratings, locations, images, and travel details require independent verification.
+The app creates AI-generated suggestions. It does not book hotels, guarantee availability or prices, or verify generated facts. Google Places autocomplete is imported but the current destination field is a standard text input. The app has no first-party backend API.
+
+The current browser-side Gemini key exposure, localStorage-based profile checks, and missing committed Firestore rules are known production risks, not issues that should be hidden in support reports.
 
 ## Maintainer
 
 **Brajesh Kumar**  
 GitHub: [@Brajesh31](https://github.com/Brajesh31)
 
-Support is provided on a best-effort basis. No guaranteed response time or commercial support commitment is offered.
+Support is maintained on a best-effort basis. No guaranteed response time or commercial support agreement is provided.
