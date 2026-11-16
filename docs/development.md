@@ -1,10 +1,10 @@
-# Development Guide
+# 🧑‍💻 Development Guide
 
-## Development model
+## 📌 Development model
 
 AI Trip Planner is a React 18 JSX application built with Vite 5 and npm. Vite serves the application during development and creates the production assets. There is no first-party backend service in the repository.
 
-## Source map
+## 📌 Source map
 
 | Path | Responsibility |
 |---|---|
@@ -25,14 +25,14 @@ AI Trip Planner is a React 18 JSX application built with Vite 5 and npm. Vite se
 | `src/App.css` | Landing component styles |
 | `src/lib/utils.js` | Utility class merger |
 
-## Scripts
+## 📌 Scripts
 
 - `npm run dev`: development server.
 - `npm run build`: production build into `dist/`.
 - `npm run preview`: serve the production build locally.
 - `npm run lint`: run ESLint with the current package script.
 
-## Recommended workflow
+## 📌 Recommended workflow
 
 1. Pull the latest main branch.
 2. Read relevant architecture and service documentation.
@@ -45,29 +45,29 @@ AI Trip Planner is a React 18 JSX application built with Vite 5 and npm. Vite se
 9. Update docs and changelog when behavior or configuration changes.
 10. Review the diff and ensure no secrets or generated files are included.
 
-## Component conventions
+## 📌 Component conventions
 
 Keep components focused on one view or reusable concern. Put provider operations in service modules rather than duplicating SDK setup throughout components. Keep prompt constants and recognized option values centralized. Use stable keys for mapped JSX. Prefer state values with consistent naming and types.
 
 Do not disable React hook or accessibility lint rules broadly to suppress warnings. Fix dependencies and state ownership where possible, documenting narrowly scoped exceptions if unavoidable.
 
-## Async operations
+## 📌 Async operations
 
 Provider and Firestore requests can fail. Each operation should have explicit pending, success, empty, and failure states. Avoid unhandled promise rejections. Prevent duplicate generation requests and stale state updates after route changes. Do not log tokens, full user profiles, or complete private itineraries.
 
-## Form validation
+## 📌 Form validation
 
 Validate destination length, supported duration range, integer day counts, budget choices, and traveler categories before calling Gemini. Use one canonical field name for day count throughout input state, prompt interpolation, Firestore persistence, and rendering. Do not trust values merely because the UI normally supplies them.
 
-## Gemini output handling
+## 📌 Gemini output handling
 
 Model response text is untrusted. Parse it in one service boundary, validate required fields and data size, reject malformed content, and only then persist. Do not render generated content as raw HTML or trust model-supplied links and facts.
 
-## Firestore access
+## 📌 Firestore access
 
 Client-side filtering by email is not authorization. Firestore Security Rules must use a trusted identity and prevent cross-user reads and writes. Review authentication and data model docs together before changing persistence.
 
-## Local validation
+## 📌 Local validation
 
 ```bash
 npm ci
@@ -76,6 +76,6 @@ npm run build
 npm run preview
 ```
 
-## Documentation obligations
+## 📌 Documentation obligations
 
 Changes to routes require updates to architecture and deployment. Changes to public variables require updates to environment docs and .env.example. Changes to prompt fields require updates to AI output, database, and renderers. Changes to auth or ownership require updates to authentication, Firestore, privacy, and security docs.
