@@ -1,12 +1,12 @@
-# Deployment Guide
+# 🌐 Deployment Guide
 
-## 1. Build and hosting model
+## 📌 1. Build and hosting model
 
 AI Trip Planner is a Vite single-page application. A production deployment must build the source and publish the generated `dist/` directory. Publishing the repository root as the site output without a build step will not produce the intended application.
 
 The repository includes `vercel.json` with a rewrite to `/index.html`, allowing React Router to resolve browser-history routes on direct navigation and refresh.
 
-## 2. Prerequisites
+## 📌 2. Prerequisites
 
 - A reviewed commit on the deployment branch.
 - Node.js and npm available in the build environment.
@@ -15,7 +15,7 @@ The repository includes `vercel.json` with a rewrite to `/index.html`, allowing 
 - Firebase project configuration and Firestore Security Rules.
 - A verified deployment domain with HTTPS.
 
-## 3. Build commands
+## 📌 3. Build commands
 
 ```bash
 npm ci
@@ -25,7 +25,7 @@ npm run build
 
 Vite writes the production application to `dist/`. Configure the hosting provider to publish this directory.
 
-## 4. Vercel project configuration
+## 📌 4. Vercel project configuration
 
 Use the following expected settings:
 
@@ -39,7 +39,7 @@ Use the following expected settings:
 
 Confirm the production branch and ensure the deployment uses the intended project. The existing `vercel.json` rewrite sends client-side paths to `index.html`. Test that this does not interfere with static assets.
 
-## 5. Environment variables
+## 📌 5. Environment variables
 
 The current client-side variables are:
 - `VITE_GOOGLE_AUTH_CLIENT_ID`;
@@ -52,17 +52,17 @@ Set values in the correct Vercel environment. Vite variables are injected at bui
 
 The current Firebase web configuration is hard-coded in `src/service/FirebaseConfig.jsx`. Firebase web config is not a secret authorization boundary. Secure the database with rules and verify project selection for production.
 
-## 6. Google OAuth configuration
+## 📌 6. Google OAuth configuration
 
 Configure the Google OAuth client with the exact production JavaScript origin. Review authorized domains, consent configuration, and any redirect behavior required by the client library. Test sign-in success, cancellation, and provider errors on the deployed hostname.
 
 Do not use development origins as production origins.
 
-## 7. Google Maps / Places configuration
+## 📌 7. Google Maps / Places configuration
 
 Enable only required Maps Platform APIs, configure billing where required, and restrict browser keys to approved referrers and required APIs. Test autocomplete on the deployed hostname, not only localhost. Verify quota and error behavior.
 
-## 8. Firebase project and Firestore rules
+## 📌 8. Firebase project and Firestore rules
 
 Ensure the intended production Firebase project is selected. Deploy restrictive Firestore rules before enabling user traffic. Rules must enforce authenticated ownership for every trip document read and write.
 
@@ -74,7 +74,7 @@ Test:
 - unauthenticated requests are denied;
 - document ownership cannot be reassigned by editing client data.
 
-## 9. Post-deployment verification
+## 📌 9. Post-deployment verification
 
 - [ ] Landing route loads.
 - [ ] All nested routes load directly and after refresh.
@@ -89,7 +89,7 @@ Test:
 - [ ] Mobile and desktop layouts remain usable.
 - [ ] HTTPS is active.
 
-## 10. Rollback
+## 📌 10. Rollback
 
 Record the deployed commit. If a release breaks routes or data access, redeploy the previous known-good build and verify it. If a key is exposed or user data was accessible, rollback alone is insufficient: rotate credentials, inspect provider usage, and correct access rules.
 
