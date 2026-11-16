@@ -1,34 +1,41 @@
-# Repository Maintenance Guide
+# Repository Maintenance
 
-## Routine maintenance
-Review whether README commands work, docs match source, links resolve, package scripts remain accurate, dependencies are maintained, keys remain restricted, Firestore rules protect user records, issue templates remain useful, and workflows have suitable permissions.
+## Purpose
+Maintain the React/Vite application without adding unnecessary infrastructure or allowing generated files, stale documentation, or exposed credentials to accumulate.
 
-## Dependency management
-The repository uses npm and `package-lock.json`. Install with `npm ci`. Do not commit `node_modules/`. Use Dependabot or reviewed manual updates for packages and GitHub Actions. Review changelogs and breaking changes before updating React, Vite, Firebase, OAuth, or the Google AI SDK.
+## Routine checks
+Periodically review the README, environment example, package manifest and lockfile consistency, route configuration, service modules, provider model versions, Firebase Security Rules, deployment rewrite, CI configuration, issue templates, media rights, and roadmap.
 
-Do not run `npm audit fix --force` blindly. Review the vulnerability, dependency path, available patch, and breaking-change risk first.
+## Dependency maintenance
+Use npm and the committed `package-lock.json`. For an update, inspect package release and migration notes, update the manifest deliberately, run npm install to update the lockfile, review the lockfile diff, run lint and production build, and test affected provider and UI flows. Commit manifest and lockfile together.
 
-## Provider configuration
-Periodically review OAuth authorized origins, browser API-key restrictions, enabled APIs, billing and quota, Firebase project settings, and Firestore Security Rules. Rotate keys if exposure or unauthorized use is suspected.
+Do not manually edit generated dependency files. The current repository has a large tracked `node_modules/` tree. Generated dependencies should be removed from version control in a deliberate cleanup while keeping the lockfile. Do not remove partial directory fragments and claim cleanup is complete.
 
-## GitHub Actions
-Use minimum workflow permissions. Do not expose secrets to untrusted pull-request code. Review action versions and logs. A passing workflow verifies only the checks it actually performs.
+## Workflow maintenance
+The repository currently includes README timestamp automation but no complete application CI pipeline. A future CI workflow should use npm ci, lint, build, least-privilege permissions, and concurrency controls. It should not deploy unless deployment is intentionally configured.
 
-## File hygiene
-Do not commit OS metadata, editor caches, build output, temporary logs, local environment files, or generated dependency directories. Preserve the npm lockfile. Keep IDE configuration only when intentionally shared and useful.
+## Configuration maintenance
+Keep `.env.example` aligned with actual `import.meta.env` references. Never add populated secrets. Document whether each variable is public browser configuration or server-only. Review provider restrictions and quotas.
+
+## Data maintenance
+Review Firestore indexes, Security Rules, backup policy, retention, deletion behavior, and development/production separation. Never export real user itineraries into public fixtures.
 
 ## Documentation maintenance
-Route changes require updates to README, architecture, testing, and deployment guides. AI fields require updates to AI generation and data model guides. OAuth changes affect authentication, privacy, and security. Firestore schema/rules changes affect database, data model, security, and testing. Environment changes affect the example, installation, deployment, and config guide. Build changes affect installation and CI.
+When source behavior changes, update architecture, API, environment, authentication, Firestore, privacy, security, testing, and deployment documents as applicable. Remove claims that no longer match code. Add new guides to this index and README.
+
+## File hygiene
+Ignore node_modules, dist, environment files, caches, logs, coverage, and IDE state unless a shared project setting is intentionally required. Retain package-lock.json. Review tracked artifacts before release.
 
 ## Incident response
-For leaked keys, revoke or rotate and inspect provider usage. For exposed travel data, review Firestore access and logs. For broken deployments, redeploy the last known-good build. Follow private reporting in SECURITY.md.
+For exposed credentials, revoke or rotate them immediately and assess provider usage. For data exposure, investigate affected records and provider logs. For a bad deployment, restore the last known-good deployment and verify all direct routes.
 
-## Checklist
-- [ ] README and docs reflect current code.
-- [ ] Lint and production build pass.
-- [ ] npm lockfile is synchronized with package.json.
-- [ ] node_modules and local environment files are not tracked.
-- [ ] Provider keys are restricted.
-- [ ] Firestore access rules are reviewed.
-- [ ] User-data retention and deletion are documented.
-- [ ] Workflows use minimum permissions.
+## Maintenance checklist
+- [ ] Package manifest and lockfile are consistent.
+- [ ] No generated dependency tree is tracked.
+- [ ] .env and private data are not committed.
+- [ ] Provider keys are restricted and rotated where needed.
+- [ ] Firestore rules and indexes are reviewed.
+- [ ] Lint and build checks are green.
+- [ ] Routes and failure states are tested.
+- [ ] Documentation reflects actual source behavior.
+- [ ] Roadmap and changelog are accurate.
