@@ -1,36 +1,22 @@
 # AI Prompt and Output Contract
 
-## 1. Role of the AI integration
+## Purpose
+The trip creation flow asks Gemini to generate hotel suggestions and a day-by-day itinerary based on destination, duration, traveler group, and budget. The integration is implemented in `src/service/AIModal.jsx` and called from `src/create-trip/index.jsx`.
 
-The trip creation flow asks a Gemini model to generate hotel suggestions and a day-by-day itinerary based on a destination, duration, traveler group, and budget category. The current integration is implemented in `src/service/AIModal.jsx` and called from `src/create-trip/index.jsx`.
+Generated content is advisory. It is not a verified source of current prices, hours, availability, safety, travel times, or accessibility.
 
-Generated content is advisory. It is not a verified source of current prices, operating hours, travel times, hotel availability, safety information, ticket costs, or accessibility.
+## Current model configuration
+The service reads `VITE_GOOGLE_GEMINI_AI_API_KEY`, creates a Google Generative AI client, selects `gemini-1.5-flash`, and configures temperature, topP, topK, maximum output tokens, and JSON response MIME type. It creates a chat session with a lengthy embedded Las Vegas sample exchange.
 
-## 2. Current model configuration
+Check current provider documentation before changing model identifiers or SDK behavior. The embedded history is prototype context, not a system of factual grounding.
 
-The service:
-- creates a `GoogleGenerativeAI` client with `VITE_GOOGLE_GEMINI_AI_API_KEY`;
-- selects `gemini-1.5-flash`;
-- sets temperature, topP, topK, maximum output tokens, and JSON response MIME type;
-- creates a chat session with a large embedded Las Vegas sample exchange.
+## Prompt inputs
+The template in `src/constants/Options.jsx` substitutes destination, total days, traveler group, and budget. The current trip form has inconsistent day-count spelling between `noOfdays` and `nOofdays`; it calculates a numeric conversion but does not use that converted value in its state update. Fixing that belongs in source code, not in documentation alone.
 
-The model identifier and SDK behavior should be checked against current provider documentation before upgrading. Do not assume a model name remains available indefinitely.
+Validate destination length, positive integer duration, supported duration range, recognized budget values, and recognized traveler values before a provider call.
 
-## 3. User input fields
-
-The prompt template in `src/constants/Options.jsx` interpolates:
-- `location`: destination text;
-- `totalDays`: requested trip duration;
-- `traveler`: traveler category;
-- `budget`: budget category.
-
-The current source uses inconsistent capitalization for the day count key: some code references `noOfdays` and other code references `nOofdays`. The number conversion result is calculated but the state update currently stores the original value. These are implementation defects to address separately from documentation.
-
-Inputs should be validated before contacting the model. At minimum, validate destination length, integer day count, upper/lower duration limits, recognized budget values, and recognized traveler categories.
-
-## 4. Expected response shape
-
-The rendering components expect a structure similar to:
+## Expected response structure
+The UI expects a root object with `hotel_options` array and `itinerary` object. Example shape:
 
 ```json
 {
@@ -38,8 +24,8 @@ The rendering components expect a structure similar to:
     {
       "HotelName": "Example hotel",
       "HotelAddress": "Example address",
-      "Price": "Sample price range",
-      "HotelImageUrl": "https://example.invalid/image.jpg",
+      "Price": "Sample range",
+      "HotelImageUrl": "https://example.invalid/hotel.jpg",
       "GeoCoordinates": "0.0000, 0.0000",
       "Rating": "Example rating",
       "Description": "Example description"
@@ -63,63 +49,24 @@ The rendering components expect a structure similar to:
 }
 ```
 
-This example documents the fields expected by current components. It is not a formal JSON Schema or guaranteed model response.
+This is a description of fields consumed by the current UI, not a formal schema or guarantee of model output.
 
-## 5. Current parser behavior
+## Current parser behavior
+The form reads `result.response.text()` and passes the raw text to `JSON.parse`. A parse error is caught and a toast is displayed. There is no full schema validation, Markdown fence normalization, provider timeout, or bounded retry strategy.
 
-The form reads `result.response.text()` and passes the text to `JSON.parse`. It catches a parse exception and displays a toast, but there is no complete schema validation, Markdown-fence normalization, retry policy, or provider timeout handling.
+Valid JSON can still have the wrong shape. A day may omit `places`, a hotel field may be null, or the root may be an array. Components currently assume required nested values exist.
 
-A valid JSON string can still have the wrong shape. For example, `itinerary` could be an array, a day object could lack `places`, or a hotel field could be null. Components currently assume several nested properties exist.
+## Validation required before saving
+A safer implementation should parse controlled text, reject empty or oversized output, validate the root object, validate hotel and itinerary collections, validate every field used by renderers, constrain string lengths and item counts, reject unsafe URL protocols, normalize optional values, and write only validated records. Render model text as text, never as trusted HTML.
 
-## 6. Required validation before persistence
+## Factual reliability
+Model output can invent hotels, addresses, coordinates, prices, ticket fees, travel times, or image URLs. It can suggest closed attractions or impossible schedules. The interface should label results as AI-generated and instruct users to verify critical details with official providers. The project does not book hotels.
 
-A safer implementation should:
-1. parse the response in a controlled function;
-2. reject empty or excessively large responses;
-3. validate that the root is an object;
-4. validate that `hotel_options` is an array;
-5. validate every hotel field used by the UI;
-6. validate that `itinerary` is a plain object;
-7. validate each day record and its `places` array;
-8. constrain string lengths and array counts;
-9. normalize absent optional values;
-10. reject unsupported URL protocols;
-11. store only validated and size-limited data;
-12. render all model text as text, never trusted HTML.
+## Prompt injection and user content
+Destination is user-controlled. Do not treat user text as trusted instructions. Separate fixed instructions from user fields, constrain output structure, and avoid sending unnecessary personal data. Prompt constraints do not replace schema validation or server-side authorization.
 
-Use a schema validator such as Zod only if the project deliberately adds it as a dependency and documents its use.
+## Cost and abuse controls
+The Gemini key is bundled into the browser. Visitors can extract and reuse it outside the app. Quotas and referrer restrictions help but are not authentication. Production generation should use a server function with authentication, request limits, input bounds, budget monitoring, and minimal safe logging.
 
-## 7. Safety and factual reliability
-
-Model-generated content may hallucinate:
-- hotels that do not exist;
-- incorrect addresses or coordinates;
-- stale prices and ticket fees;
-- closed attractions;
-- impossible daily schedules;
-- incorrect travel duration;
-- image URLs that fail or point to unrelated content.
-
-The UI must label suggestions as AI-generated and instruct users to verify critical details with official providers. Do not represent generated hotel cards as booking inventory.
-
-## 8. Prompt injection and user content
-
-Destination input is user-controlled. Do not treat arbitrary user text as trusted system instructions. Future prompt design should separate instruction hierarchy from user-supplied fields, constrain output format, and avoid passing private user data unnecessarily.
-
-Prompt constraints do not replace output validation or server-side authorization.
-
-## 9. Cost and abuse controls
-
-A browser-exposed Gemini API key can be extracted and reused outside the application. Provider-side quotas and referrer restrictions can limit some abuse but are not a complete authentication boundary. Production generation should pass through a server-side function with authenticated identity, request limits, input bounds, usage logging that avoids sensitive content, and budget monitoring.
-
-## 10. Change management
-
-When changing the prompt or expected response:
-- update the prompt template;
-- update parser and validation tests;
-- update hotel and itinerary renderers;
-- update this document and Firestore data documentation;
-- test missing fields and malformed JSON;
-- confirm older saved trips still render or provide a migration/fallback.
-
-Do not silently change key names without considering already stored Firestore documents.
+## Change management
+When the prompt or response changes, update parser validation, hotel and itinerary renderers, this contract, Firestore documentation, and tests. Consider compatibility with already saved documents. Do not rename fields without handling historical records.
