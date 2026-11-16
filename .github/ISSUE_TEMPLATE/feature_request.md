@@ -1,38 +1,37 @@
 ---
 name: Feature request
-about: Propose a focused application or developer-experience improvement
+about: Propose a scoped improvement to the trip planner
 title: "[FEATURE] "
 labels: ["enhancement", "triage"]
 assignees: []
 ---
 
-## Problem
-What user problem or development limitation should be addressed?
+## User problem
+What problem should this feature solve, and who experiences it?
 
-## Proposed solution
-Describe the expected behavior in enough detail to review the scope.
+## Proposed behavior
+Describe the user-visible outcome and expected interaction.
 
-## Affected routes and components
-List likely route screens, components, service modules, and configuration.
+## Routes and components affected
+List the relevant pages, components, and services.
 
-## Provider and data impact
-- Does this add or change Google, Gemini, Places, or Firebase use?
-- Does it add a Firestore field or collection?
-- Does it require a new environment variable?
-- Does it introduce or change personal data processing?
-- Does it add a dependency or server-side component?
+## Data and provider impact
+- Does this change Gemini prompts or response schema?
+- Does this change Firestore fields or ownership?
+- Does it add a provider or third-party dependency?
+- Does it collect or store personal data?
+- Does it require server-side functionality?
 
 ## Security and privacy
-Explain identity, ownership, API-key, rate-limit, data retention, and deletion implications.
+Explain authentication, authorization, key management, data retention, and provider disclosure implications.
 
 ## Accessibility
-Describe keyboard operation, accessible names, focus behavior, loading/error announcements, and reduced-motion needs.
+Describe keyboard support, focus, semantics, and loading/error announcements.
 
-## Alternatives considered
-Describe simpler approaches and why they are insufficient.
+## Alternatives
+List simpler options considered.
 
 ## Validation plan
-Explain automated and manual tests, provider failure cases, responsive checks, and any Firestore rules tests.
+Describe lint, build, route, provider, data-rule, and browser tests required.
 
-## Scope reminder
-The current application generates itinerary suggestions. Real booking, verified availability, ticketing, and payment require a separate product and integration design.
+Do not propose presenting AI-generated travel information as verified availability or booking confirmation.
