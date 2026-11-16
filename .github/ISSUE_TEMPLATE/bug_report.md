@@ -1,33 +1,33 @@
 ---
 name: Bug report
-about: Report a reproducible defect in the app, an integration, or repository automation
+about: Report a reproducible issue in an existing route or integration
 title: "[BUG] "
 labels: ["bug", "triage"]
 assignees: []
 ---
 
 ## Summary
-Describe the defect and why it affects behavior that is currently implemented.
+Describe what is broken and why this is a defect in existing behavior.
 
-## Affected area
-- [ ] Routing or navigation
-- [ ] Trip form or validation
+## Affected route or area
+- [ ] Landing page
+- [ ] Trip creation form
 - [ ] Google OAuth
-- [ ] Gemini generation or parsing
-- [ ] Firestore save/read/security
-- [ ] Places autocomplete
-- [ ] Trip list or trip detail
-- [ ] Responsive UI or accessibility
-- [ ] Build, configuration, or deployment
-- [ ] Documentation
+- [ ] Gemini generation
+- [ ] Firestore save/list/detail
+- [ ] My Trips
+- [ ] Trip details
+- [ ] Responsive layout or accessibility
+- [ ] Build, lint, or deployment
+
+Route / component / file:
 
 ## Environment
-- Route:
 - Browser and version:
-- Operating system:
-- Node and npm versions:
-- Viewport:
-- Commit:
+- OS:
+- Node.js / npm (if relevant):
+- Commit or branch:
+- Local or deployed URL (remove private values):
 
 ## Steps to reproduce
 1.
@@ -38,14 +38,11 @@ Describe the defect and why it affects behavior that is currently implemented.
 
 ## Actual behavior
 
-## Evidence
-Attach sanitized Console/Network output or screenshots. Remove API keys, OAuth tokens, email addresses when unnecessary, private itineraries, and personal data.
+## Console / Network output
+Paste sanitized errors. Never include API keys, OAuth tokens, Firebase tokens, email addresses, or private itineraries.
 
-## Validation already performed
-- [ ] Reproduced using a clean install with `npm ci`.
-- [ ] Checked `npm run lint`.
-- [ ] Checked `npm run build`.
-- [ ] Checked browser console and network errors.
-- [ ] Confirmed the issue is not an intentionally unimplemented feature.
-
-## Additional context
+## Validation
+- [ ] Reproduced using a non-production test account.
+- [ ] Confirmed the issue is not caused by missing environment configuration.
+- [ ] Checked relevant documentation.
+- [ ] Used synthetic travel data.
