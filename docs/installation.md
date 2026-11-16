@@ -1,16 +1,20 @@
 # Installation and Local Development
 
-## Project overview
-AI Trip Planner is a React application built with Vite. It provides a landing page, trip preference form, AI itinerary generation, Google sign-in, Firestore trip storage, saved trips, and trip details.
+## 1. Overview
 
-## Prerequisites
-- Node.js compatible with Vite 5, preferably a current supported LTS release.
-- npm, Git, and a modern browser.
-- Access to the Google Cloud and Firebase projects for provider-backed features.
+AI Trip Planner is a React 18 and Vite application. It uses npm for dependency installation, Vite for development and production builds, React Router for navigation, Firebase for persistence, Google OAuth for sign-in, and the Google Generative AI SDK for itinerary generation.
 
-The repository uses npm and includes `package-lock.json`. Use npm commands. Do not introduce Bun or Yarn lockfiles.
+This guide explains local setup. It does not provision Google Cloud, Firebase, or Vercel resources for you.
 
-Check versions:
+## 2. Prerequisites
+
+Install:
+- Git;
+- a supported Node.js LTS release compatible with the Vite 5 toolchain;
+- npm (bundled with Node.js);
+- a modern browser.
+
+Confirm versions:
 
 ```bash
 node --version
@@ -18,67 +22,133 @@ npm --version
 git --version
 ```
 
-## Clone and install
+The repository includes `package-lock.json`. Use `npm ci` to install the lockfile-resolved dependency tree. Do not delete or regenerate the lockfile as a routine troubleshooting step.
+
+## 3. Clone the repository
+
 ```bash
 git clone https://github.com/Brajesh31/AiTripPlanner.git
 cd AiTripPlanner
+```
+
+Confirm the working tree and package scripts:
+
+```bash
+git status --short
+npm run
+```
+
+## 4. Install dependencies
+
+```bash
 npm ci
 ```
 
-Use `npm ci` to install the dependency tree specified by the lockfile. Do not commit `node_modules/`; it is generated content and should be excluded by repository ignore rules.
+The repository currently tracks a large `node_modules/` directory in Git. This is not required for reproducible installation and should be removed from repository history through a deliberate cleanup. A clean local install should still use `npm ci` and the committed lockfile.
 
-## Configure environment
-Copy the template:
+Do not commit local dependency changes or generated Vite caches.
 
-PowerShell:
+## 5. Configure environment variables
+
+Copy the example file:
+
+### PowerShell
+
 ```powershell
 Copy-Item .env.example .env
 ```
 
-macOS / Linux:
+### macOS / Linux
+
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Purpose | Exposure |
-|---|---|---|
-| `VITE_GOOGLE_AUTH_CLIENT_ID` | Google OAuth browser client ID | Public identifier |
-| `VITE_GOOGLE_GEMINI_AI_API_KEY` | Gemini browser SDK key | Public in built bundle |
-| `VITE_GOOGLE_PLACES_API_KEY` | Places-related key | Public in built bundle |
+Set the provider values described in [Environment Configuration](environment.md):
+- `VITE_GOOGLE_AUTH_CLIENT_ID`
+- `VITE_GOOGLE_GEMINI_AI_API_KEY`
+- `VITE_GOOGLE_PLACES_API_KEY`
 
-Vite exposes `VITE_*` variables to browser code. Never put a privileged server-only secret in one. The current Gemini integration uses a browser-side key and should be moved behind a server endpoint for production. Restrict browser keys by origin and enabled API.
+The current source directly reads the Gemini key through `import.meta.env`. Google OAuth reads the client ID in `src/main.jsx`. The Places key is present in the example and a commented-out service helper, but that helper is not currently active.
 
-Firebase configuration is currently hard-coded in `src/service/FirebaseConfig.jsx`. A Firebase web API key is not a replacement for security rules. Secure Firestore through authenticated ownership rules. Never commit a populated `.env` file.
+**Security:** Vite exposes `VITE_*` values in browser assets. Do not put private credentials in these variables. The current browser-side Gemini key is visible to users. Use provider restrictions for development, and move privileged AI calls to a server-side function before production.
 
-## Run the development server
+## 6. Start the development server
+
 ```bash
 npm run dev
 ```
 
-Open the exact local URL printed by Vite, normally `http://localhost:5173`. Restart Vite after changing environment values.
+Vite prints the local URL in the terminal, commonly `http://localhost:5173`. Use the exact URL printed by your local process.
 
-## Routes to verify
-| Path | Expected screen |
+To expose the dev server to a local network for device testing:
+
+```bash
+npm run dev -- --host 0.0.0.0
+```
+
+Do not expose a development server publicly with unrestricted provider keys.
+
+## 7. Available scripts
+
+| Command | Purpose |
 |---|---|
-| `/` | Landing page |
-| `/create-trip` | Trip preferences and generation form |
-| `/my-trips` | Saved trips |
-| `/view-trip/:tripId` | Saved itinerary |
+| `npm run dev` | Start Vite development server |
+| `npm run build` | Create optimized production output in `dist/` |
+| `npm run preview` | Preview the built output locally |
+| `npm run lint` | Run ESLint using the repository's current script |
 
-## Build and preview
+Run the checks before pushing:
+
 ```bash
 npm run lint
 npm run build
-npm run preview
 ```
 
-Vite emits the production build to `dist/`. Preview is for local verification, not production hosting.
+The lint command currently uses ESLint 8 and scans JavaScript/JSX files. Existing source contains disabled rules and unused imports; do not assume a passing lint run proves functional correctness.
 
-## Common setup errors
-- **Missing environment variable:** confirm `.env` is at repository root, spelling matches, and Vite was restarted.
-- **OAuth origin error:** add the exact development origin to the Google OAuth client configuration.
-- **Gemini request failure:** verify model access, key restrictions, quota, and API availability.
-- **Firestore permission denied:** inspect identity and Firestore Security Rules. Never make the database publicly writable to bypass the error.
-- **Deep-link 404:** confirm the deployment host applies the SPA fallback rewrite.
+## 8. Application routes
 
-See [Troubleshooting](troubleshooting.md), [Environment Configuration](environment-configuration.md), and [Deployment](deployment.md).
+The current router defines:
+
+| Route | Component | Purpose |
+|---|---|---|
+| `/` | `App` | Landing and hero page |
+| `/create-trip` | `CreateTrip` | Trip preference and generation flow |
+| `/view-trip/:tripId` | `ViewTrip` | Read and render one Firestore trip |
+| `/my-trips` | `MyTrips` | List trips for the cached signed-in profile |
+
+The header is rendered outside the route provider in `src/main.jsx`. The application also mounts Google OAuth and a toast notification container.
+
+## 9. Provider setup checklist
+
+Before testing sign-in or trip generation:
+- create or identify the Firebase project;
+- enable Firestore and configure Security Rules;
+- configure the Google OAuth consent screen and browser client ID;
+- add the correct local origin to OAuth authorized JavaScript origins;
+- enable the Gemini API for the project used by the AI key;
+- restrict browser-exposed keys by allowed origin and API where supported;
+- configure billing and quotas as required by the provider;
+- confirm the project has no production data in a development environment.
+
+Never paste keys into public issues, screenshots, or chat logs.
+
+## 10. First-run verification
+
+1. Start Vite and open the landing page.
+2. Navigate to the trip creation route.
+3. Confirm the header and form render.
+4. Test the location field and autocomplete behavior.
+5. Complete duration, budget, and traveler selections.
+6. Test Google sign-in using a designated test account.
+7. Generate a sample itinerary only after verifying the provider key and quota.
+8. Confirm that a Firestore document is created.
+9. Open the returned trip detail route.
+10. Open My Trips and confirm the expected record appears for the signed-in account.
+
+The application currently has limited error handling in several async paths. Use a non-production Firebase project and synthetic trip data while testing.
+
+## 11. Troubleshooting setup
+
+See [Troubleshooting](troubleshooting.md) for dependency, Vite, environment, OAuth, Gemini, Firestore, and route issues. See [Environment Configuration](environment.md) for exact variable behavior.
