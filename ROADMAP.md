@@ -1,8 +1,8 @@
-# AI Trip Planner Roadmap
+# 🛣️ AI Trip Planner Roadmap
 
 This roadmap tracks practical product and engineering improvements. Items are proposals until implemented, tested, and documented. Security and data ownership work takes priority over adding new visual features.
 
-## Completed foundation
+## 📌 Completed foundation
 
 - [x] React and Vite application entry point.
 - [x] React Router routes for home, create trip, trip detail, and saved trips.
@@ -14,7 +14,7 @@ This roadmap tracks practical product and engineering improvements. Items are pr
 - [x] Security, privacy, authentication, and AI output limitations documented.
 - [x] Detailed testing and deployment guidance added.
 
-## Priority 0: security and data ownership
+## 📌 Priority 0: security and data ownership
 
 - [ ] Move privileged Gemini requests behind a server-side endpoint.
 - [ ] Rotate/restrict exposed browser keys and remove privileged provider access from client bundles.
@@ -23,7 +23,7 @@ This roadmap tracks practical product and engineering improvements. Items are pr
 - [ ] Define trip ownership, deletion, account closure, and retention behavior.
 - [ ] Remove sensitive profile, token, prompt, and itinerary data from debug logs.
 
-## Priority 1: correctness and reliability
+## 📌 Priority 1: correctness and reliability
 
 - [ ] Normalize and validate destination, duration, budget, and traveler fields.
 - [ ] Resolve inconsistent day-count spelling in form state.
@@ -34,7 +34,7 @@ This roadmap tracks practical product and engineering improvements. Items are pr
 - [ ] Replace timestamp document IDs with Firestore-generated IDs or a suitable unique ID strategy.
 - [ ] Add tests for trip form input and AI response parsing.
 
-## Priority 2: user experience and accessibility
+## 📌 Priority 2: user experience and accessibility
 
 - [ ] Make destination autocomplete genuinely active or remove unused imports/configuration.
 - [ ] Make budget and traveler selections fully keyboard-operable with selected state.
@@ -44,7 +44,7 @@ This roadmap tracks practical product and engineering improvements. Items are pr
 - [ ] Add trip deletion and user data controls after the ownership model is secure.
 - [ ] Label generated suggestions and require verification of travel details.
 
-## Priority 3: maintainability and operations
+## 📌 Priority 3: maintainability and operations
 
 - [ ] Remove tracked `node_modules/` and generated Vite cache from Git while preserving package-lock.json.
 - [ ] Add CI for npm ci, lint, and build.
@@ -55,7 +55,7 @@ This roadmap tracks practical product and engineering improvements. Items are pr
 - [ ] Add operational monitoring without logging sensitive itineraries.
 - [ ] Document backup and restore procedure.
 
-## Non-goals without a separate product decision
+## 📌 Non-goals without a separate product decision
 
 - Direct hotel reservations or payment processing.
 - Claims that generated prices or availability are guaranteed.
@@ -63,6 +63,6 @@ This roadmap tracks practical product and engineering improvements. Items are pr
 - Treating browser localStorage as trusted identity.
 - Adding a backend or complex infrastructure solely for appearance.
 
-## Prioritization policy
+## 📌 Prioritization policy
 
 Fix data exposure and authorization before expanding user features. Fix invalid model output handling before claiming reliable trip generation. Do not mark roadmap items complete until source changes are committed and relevant tests have been run.
