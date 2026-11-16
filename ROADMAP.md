@@ -1,61 +1,68 @@
-# Project Roadmap
+# AI Trip Planner Roadmap
 
-This roadmap describes engineering improvements for the current AI Trip Planner codebase. Items are proposals until implemented, reviewed, and tested.
+This roadmap tracks practical product and engineering improvements. Items are proposals until implemented, tested, and documented. Security and data ownership work takes priority over adding new visual features.
 
-## Current baseline
+## Completed foundation
 
-- React 18 and Vite 5 frontend.
-- Browser routes for landing, trip creation, saved trips, and trip details.
-- Google OAuth browser integration with profile data stored in local storage.
-- Gemini SDK call from the browser.
-- Firestore persistence in the `AITrips` collection.
-- Places autocomplete dependency.
-- Vercel rewrite for client-side routes.
-- npm package manifest and lockfile.
+- [x] React and Vite application entry point.
+- [x] React Router routes for home, create trip, trip detail, and saved trips.
+- [x] Google OAuth browser sign-in flow.
+- [x] Gemini-based itinerary generation prototype.
+- [x] Firestore trip document create, list, and detail read paths.
+- [x] Vercel SPA fallback configuration.
+- [x] Project-specific technical documentation and environment examples.
+- [x] Security, privacy, authentication, and AI output limitations documented.
+- [x] Detailed testing and deployment guidance added.
 
-## Priority 0: Security and ownership
+## Priority 0: security and data ownership
 
-- [ ] Move Gemini generation behind a trusted server endpoint.
-- [ ] Rotate and restrict exposed provider keys.
-- [ ] Add and review Firestore Security Rules.
-- [ ] Enforce per-user document ownership using verified identity.
-- [ ] Replace local-storage email as an authorization decision.
-- [ ] Review Firebase Authentication integration and token lifecycle.
-- [ ] Remove sensitive debug logging.
+- [ ] Move privileged Gemini requests behind a server-side endpoint.
+- [ ] Rotate/restrict exposed browser keys and remove privileged provider access from client bundles.
+- [ ] Align Google sign-in with Firebase Authentication or a trusted server identity.
+- [ ] Add and emulator-test Firestore Security Rules based on authenticated UID.
+- [ ] Define trip ownership, deletion, account closure, and retention behavior.
+- [ ] Remove sensitive profile, token, prompt, and itinerary data from debug logs.
 
-## Priority 1: Data reliability
+## Priority 1: correctness and reliability
 
-- [ ] Define a versioned trip schema.
-- [ ] Validate Gemini responses before Firestore writes.
-- [ ] Normalize property naming and field casing.
-- [ ] Add input constraints for destination and number of days.
-- [ ] Use robust document identifiers.
-- [ ] Handle missing, malformed, and partially generated itineraries.
-- [ ] Add user-visible timeout, quota, retry, and provider failure behavior.
+- [ ] Normalize and validate destination, duration, budget, and traveler fields.
+- [ ] Resolve inconsistent day-count spelling in form state.
+- [ ] Validate model output with a stable schema before Firestore writes.
+- [ ] Handle timeouts, rate limits, quota errors, malformed JSON, and permission failures.
+- [ ] Add clear loading, empty, success, and error states.
+- [ ] Handle missing trip documents and incomplete historical records safely.
+- [ ] Replace timestamp document IDs with Firestore-generated IDs or a suitable unique ID strategy.
+- [ ] Add tests for trip form input and AI response parsing.
 
-## Priority 2: Quality and accessibility
+## Priority 2: user experience and accessibility
 
-- [ ] Add component tests for critical forms and route views.
-- [ ] Add end-to-end route tests.
-- [ ] Add Firestore rules tests using Firebase Emulator Suite.
-- [ ] Test OAuth cancellation and provider failures.
-- [ ] Review keyboard operation and dialog focus handling.
-- [ ] Improve empty, loading, and error states.
-- [ ] Test responsive layouts and screen-reader semantics.
+- [ ] Make destination autocomplete genuinely active or remove unused imports/configuration.
+- [ ] Make budget and traveler selections fully keyboard-operable with selected state.
+- [ ] Improve sign-in dialog accessible title and focus behavior.
+- [ ] Improve mobile layouts and long itinerary content.
+- [ ] Add meaningful not-found and empty saved-trip states.
+- [ ] Add trip deletion and user data controls after the ownership model is secure.
+- [ ] Label generated suggestions and require verification of travel details.
 
-## Priority 3: Operations and performance
+## Priority 3: maintainability and operations
 
-- [ ] Add dependency update automation and review advisories.
-- [ ] Review bundle size and consider route-level code splitting.
-- [ ] Optimize public images and remote image fallbacks.
-- [ ] Add deployment verification steps.
-- [ ] Define user data retention and deletion behavior.
-- [ ] Document provider quotas and operational ownership.
+- [ ] Remove tracked `node_modules/` and generated Vite cache from Git while preserving package-lock.json.
+- [ ] Add CI for npm ci, lint, and build.
+- [ ] Add browser smoke tests for route navigation and refresh.
+- [ ] Add Firestore Emulator security-rule tests.
+- [ ] Review dependency duplication and unused packages.
+- [ ] Review provider model versions, quotas, and SDK lifecycle.
+- [ ] Add operational monitoring without logging sensitive itineraries.
+- [ ] Document backup and restore procedure.
 
-## Out of scope unless separately designed
+## Non-goals without a separate product decision
 
-Real hotel reservations, availability confirmation, ticketing, payments, and travel-provider transactions require a distinct product, provider agreements, authorization model, and security review. Do not imply they are delivered by the current application.
+- Direct hotel reservations or payment processing.
+- Claims that generated prices or availability are guaranteed.
+- Collecting passport or payment-card details.
+- Treating browser localStorage as trusted identity.
+- Adding a backend or complex infrastructure solely for appearance.
 
-## Prioritization principles
+## Prioritization policy
 
-Security and data ownership take precedence over visual expansion. Do not mark roadmap items completed until code is merged and validation evidence exists. Keep documentation synchronized with the implementation.
+Fix data exposure and authorization before expanding user features. Fix invalid model output handling before claiming reliable trip generation. Do not mark roadmap items complete until source changes are committed and relevant tests have been run.
