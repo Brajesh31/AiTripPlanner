@@ -1,8 +1,8 @@
-# Changelog
+# 📝 Changelog
 
 This changelog records changes to the AI Trip Planner repository. It does not represent official Google, Firebase, or travel-provider product releases.
 
-## Unreleased
+## 📌 Unreleased
 
 ### Added
 - Expanded installation, architecture, API, database, and application-flow documentation.
@@ -28,7 +28,7 @@ This changelog records changes to the AI Trip Planner repository. It does not re
 - The repository tracks a very large `node_modules/` directory. A deliberate bulk cleanup remains necessary.
 - The app does not book hotels or guarantee generated travel information.
 
-## Earlier repository baseline
+## 📌 Earlier repository baseline
 
 - React 18 and Vite single-page application.
 - Google OAuth browser sign-in.
