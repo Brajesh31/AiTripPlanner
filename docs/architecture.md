@@ -1,61 +1,130 @@
 # Application Architecture
 
-## Overview
-AI Trip Planner is a React single-page application bootstrapped by Vite. React renders the interface, React Router maps browser paths to views, and service modules integrate with Google and Firebase.
+## 1. Overview
 
-The current design is browser-heavy. Google OAuth and the Google user-info request run in the client, Gemini is called through a browser-side SDK, and Firestore reads and writes use the Firebase client SDK. These boundaries matter for security and reliability.
+AI Trip Planner is a React single-page application bootstrapped by Vite. React renders the UI, React Router maps browser paths to views, Tailwind CSS provides styling utilities, and service modules integrate browser-side Google and Firebase SDKs.
 
-## High-level diagram
+The application is currently browser-heavy. OAuth, profile retrieval, Gemini generation, and Firestore operations are initiated from client code. There is no first-party backend API in this repository.
+
+## 2. Runtime composition
+
 ```text
-Browser
+index.html
   |
-  +-- Vite-built React application
-  |     +-- Header: Google OAuth and local-storage profile
-  |     +-- React Router
-  |     |     +-- /                -> Hero
-  |     |     +-- /create-trip    -> CreateTrip
-  |     |     +-- /my-trips       -> MyTrips
-  |     |     +-- /view-trip/:id  -> Trip detail
-  |     +-- Service modules
-  |           +-- AIModal -> Gemini SDK
-  |           +-- FirebaseConfig -> Firestore
-  |           +-- GlobalApi -> commented Places REST helper
-  |
-  +-- Google OAuth / User Info endpoint
-  +-- Gemini API
-  +-- Google Places autocomplete integration
-  +-- Firebase Cloud Firestore
+  +-- Vite module entry: /src/main.jsx
+        |
+        +-- React StrictMode
+        +-- GoogleOAuthProvider
+        |     |
+        |     +-- Header
+        |     +-- RouterProvider
+        |     |     +-- /                   -> App -> Hero
+        |     |     +-- /create-trip        -> CreateTrip
+        |     |     +-- /view-trip/:tripId  -> ViewTrip
+        |     |     +-- /my-trips           -> MyTrips
+        |     |
+        |     +-- Toaster
+        |
+        +-- Service modules
+              +-- AIModal.jsx       -> Gemini browser SDK
+              +-- FirebaseConfig   -> Firebase app + Firestore
+              +-- GlobalApi.jsx    -> commented Places request helper
 ```
 
-## Startup and routing
-`src/main.jsx` creates the browser router, mounts the Google OAuth provider, renders the global header, route provider, and toast container. Routes are `/`, `/create-trip`, `/my-trips`, and `/view-trip/:tripId`. `src/App.jsx` renders the landing hero. `Header.jsx` is mounted globally outside route elements.
+## 3. Application entry and providers
 
-## Feature modules
-- **Landing and header:** `Hero.jsx` introduces the application. `Header.jsx` reads the profile from browser local storage and renders sign-in or user actions.
-- **Trip creation:** `src/create-trip/index.jsx` collects destination, duration, budget, and traveler group. It prompts Google sign-in when a local profile is missing, builds a prompt from `src/constants/Options.jsx`, and sends it to Gemini.
-- **AI service:** `src/service/AIModal.jsx` initializes the Google Generative AI SDK using `VITE_GOOGLE_GEMINI_AI_API_KEY`, configures a Gemini model, and starts a chat session with seeded example messages.
-- **Firebase service:** `src/service/FirebaseConfig.jsx` initializes Firebase and exports Firestore. Trip creation writes an `AITrips` document.
-- **Saved trips:** `src/my-trips/index.jsx` queries records by the email stored in local storage.
-- **Trip details:** `src/view-trip/[tripId]/Index.jsx` reads a document and passes data to overview, hotels, places, and footer components.
+`index.html` contains the root element and loads `src/main.jsx`. The entry module imports global CSS, creates the browser router, initializes the React root, and mounts the application under StrictMode and GoogleOAuthProvider.
 
-## Current data flow
-1. Visitor opens the landing page and selects trip creation.
-2. The form captures destination, duration, budget, and traveler group.
-3. If no local profile exists, Google sign-in is requested.
-4. The browser requests Google profile information and stores it in local storage.
-5. The client composes a Gemini prompt and receives response text.
-6. The client attempts to parse the text as JSON.
-7. A Firestore document is written with selections, trip data, email, and ID.
-8. The app navigates to the trip detail route.
-9. My Trips queries saved documents using the locally stored email.
+The OAuth client ID is read from `VITE_GOOGLE_AUTH_CLIENT_ID`. The header is mounted outside RouterProvider, although it uses links for navigation. Toast notifications are made available through the Toaster component.
 
-## Trust boundaries
-The browser is controlled by the user. Local storage can be changed. A model response is untrusted. A URL parameter can be modified. A Firestore document ID can be supplied manually. Therefore local-storage email is not proof of identity, client-side filtering is not authorization, model output must be validated, and Firestore Security Rules must enforce ownership.
+## 4. Route responsibilities
 
-## Current data expectations
-A saved record contains `id`, `userEmail`, `userSelection`, and `tripData`. The UI expects `tripData.hotel_options` and `tripData.itinerary`, with fields such as `HotelName`, `HotelAddress`, `Price`, `Rating`, `best_time_to_visit`, and `places`. These are observed client expectations, not a formal schema guarantee.
+| Route | Source | Responsibility |
+|---|---|---|
+| `/` | `src/App.jsx` | Landing page and Hero |
+| `/create-trip` | `src/create-trip/index.jsx` | Collect trip preferences, request AI output, and save a trip |
+| `/view-trip/:tripId` | `src/view-trip/[tripId]/Index.jsx` | Load one Firestore document and render itinerary sections |
+| `/my-trips` | `src/my-trips/index.jsx` | Query Firestore documents associated with cached user email |
 
-## Recommended production architecture
-Move Gemini and privileged Places requests behind server-side endpoints. Verify user identity on trusted infrastructure and enforce ownership with Firestore rules. Validate AI output against a runtime schema. Add explicit provider error handling, rate limiting, audit-safe logging, and integration tests. These are recommendations, not implemented features.
+The route parameter `tripId` is used as the Firestore document ID in the `AITrips` collection.
 
-See [API](api.md), [Authentication](authentication.md), [AI Generation](ai-generation.md), [Data Model](data-model.md), [Database](database.md), and [Security](security.md).
+## 5. UI layers
+
+### Custom components
+- `Header.jsx`: navigation, sign-in dialog, profile menu, and logout presentation.
+- `Hero.jsx`: landing-page headline and navigation to trip creation.
+- `UserTripCardItem.jsx`: saved trip preview card.
+
+### Trip creation
+- `create-trip/index.jsx`: form state, Google sign-in, profile request, prompt substitution, Gemini call, JSON parsing, Firestore write, and route navigation.
+
+### Trip details
+- `InfoSection.jsx`: destination and preference summary.
+- `Hotels.jsx`: hotel cards linking to Google Maps search URLs.
+- `PlacesToVisit.jsx`: groups itinerary entries by day.
+- `PlaceCardItem.jsx`: renders individual activity/place details.
+- `Footer.jsx`: detail-page footer.
+
+### UI primitives
+The `src/components/ui/` directory contains button, dialog, input, popover, toast, toaster, and toast state helpers. Several use Radix UI primitives and class-variance-authority.
+
+## 6. Service boundaries
+
+### Gemini
+`src/service/AIModal.jsx` instantiates the Google Generative AI SDK in the browser, configures the `gemini-1.5-flash` model, and exports a chat session with a large embedded sample conversation. The form sends a prompt built from destination, duration, traveler group, and budget.
+
+This is a prototype integration, not a trusted server boundary. The browser-visible key can be extracted from the built assets. The hard-coded initial conversation is a large static example and may affect prompt behavior and bundle size.
+
+### Firebase / Firestore
+`src/service/FirebaseConfig.jsx` initializes a Firebase app and exports Firestore. Trip creation writes to `AITrips`; My Trips queries by `userEmail`; the detail view reads by document ID.
+
+Client-side filtering is not authorization. Firestore rules must enforce user ownership on every read and write.
+
+### Google OAuth
+`@react-oauth/google` provides a browser OAuth flow. The client obtains an access token, then the application calls Google's User Info endpoint with Axios and stores the returned profile response in localStorage. This local profile cache is not a server-verified session and should not be used as an authorization authority.
+
+### Google Places
+The trip form imports `react-google-places-autocomplete`, but the current form uses a regular text input for the destination. `GlobalApi.jsx` contains a commented-out Places API request helper. Do not describe a working Google Places autocomplete flow as verified until the current form uses it.
+
+## 7. Data flow
+
+1. The visitor opens the landing route.
+2. The visitor selects Create Trip.
+3. The trip form collects destination, day count, budget, and traveler category.
+4. If no cached profile exists, the app opens Google sign-in.
+5. The access token is used to retrieve profile data.
+6. Profile data is stored in localStorage.
+7. The form substitutes values into the AI prompt.
+8. The browser calls Gemini and receives text expected to contain JSON.
+9. The response is parsed with JSON.parse.
+10. A Firestore document is written with user selection, trip data, email, and ID.
+11. The browser navigates to the trip detail route.
+12. The detail view reads the document and renders hotels and day-by-day places.
+
+Each external step can fail. The current code does not consistently handle rejected requests, malformed data, missing fields, unauthorized access, or rate limits.
+
+## 8. Styling and build configuration
+
+- Tailwind configuration is in `tailwind.config.js`.
+- PostCSS configuration is in `postcss.config.js`.
+- Alias `@/` is configured by Vite to refer to `src/`.
+- `jsconfig.json` provides the editor path alias.
+- `components.json` records component generator aliases.
+- Vercel rewrite configuration sends application paths to `index.html`.
+
+## 9. Known architecture risks
+
+- Gemini is called from the browser with a Vite-exposed API key.
+- Firebase config is hard-coded and needs rule/restriction review.
+- LocalStorage profile data is trusted by UI code without a server session.
+- Firestore reads by document ID must be authorized in rules, not by route secrecy.
+- Model text is JSON-parsed without a schema validator.
+- The form contains inconsistent field spelling between `noOfdays` and `nOofdays`, and a numeric conversion variable is not used when writing state.
+- Error and loading paths are incomplete for several asynchronous operations.
+- The initial Gemini chat history contains a large static Las Vegas sample.
+
+## 10. Recommended future boundary
+
+A production architecture should place privileged Gemini requests behind a server-side function. It should validate inputs, authenticate callers, enforce quotas, validate model output against a schema, and write data only after authorization. Firestore Security Rules must independently enforce ownership. The client should receive only the minimum data required to render the result.
+
+Do not add this server boundary without updating deployment, API, security, privacy, and testing guides.
