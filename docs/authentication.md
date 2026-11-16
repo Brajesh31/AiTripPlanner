@@ -1,69 +1,49 @@
-# Authentication and User Identity
+# Authentication and Identity
 
-## Current implementation
+## Current integration
+The app uses `@react-oauth/google` through `GoogleOAuthProvider` in `src/main.jsx`. The provider receives `VITE_GOOGLE_AUTH_CLIENT_ID`. The header and trip creation form call `useGoogleLogin`.
 
-The application uses the Google OAuth React integration. The OAuth provider is mounted in `src/main.jsx` using `VITE_GOOGLE_AUTH_CLIENT_ID`. The header and trip-creation screen use the OAuth hook to start sign-in.
+On success, browser code receives an OAuth response containing an access token and uses Axios to request Google's User Info endpoint. The returned profile is stored in localStorage under the key `user`.
 
-After OAuth returns an access token, the current client requests user profile information from Google's user-info endpoint. It then stores the returned profile object in browser local storage under the key `user`. The UI reads that value to decide whether to show sign-in controls and to obtain the user's email for trip queries.
+## Profile retrieval
+The current request is:
+```text
+GET https://www.googleapis.com/oauth2/v1/userinfo
+Authorization: Bearer <access token>
+```
 
-## Current sign-in flow
+Do not log the token, include it in issue reports, or expose full profile responses. Use the provider's recommended token lifecycle and avoid persisting tokens unnecessarily.
 
-1. Visitor opens the application.
-2. The header checks for a `user` item in local storage.
-3. When a visitor attempts to create a trip without that item, the sign-in dialog is opened.
-4. The user selects Google sign-in.
-5. The browser OAuth SDK obtains an access token.
-6. The app requests profile information from Google.
-7. The response is stored in local storage.
-8. The dialog closes and trip generation continues.
+## Local profile cache is not an authenticated app session
+localStorage is controlled by the browser user. It can be modified, cleared, or forged. Checking for `localStorage.getItem('user')` is a UI convenience only. It must never authorize Firestore access.
 
-The current implementation is a lightweight client-side sign-in flow. It is not a complete secure session system and should not be described as one.
+The Google OAuth access token is sensitive. Do not treat a user profile object as proof that the current caller owns a saved trip.
 
-## Identity and authorization limitations
+## Firebase identity alignment
+The current code initializes Firestore but does not demonstrate Firebase Authentication. A Google profile obtained by this OAuth package is not automatically a Firebase Auth identity.
 
-Local storage can be modified by the browser user and must never be trusted as proof of identity. A stored email value is not enough to grant access to a Firestore document.
+For production data access, use a coherent trusted identity model. A common design is Firebase Authentication with Google sign-in, then Firestore rules based on `request.auth.uid`. Another design is a trusted backend that verifies Google identity and enforces ownership. Do not secure records by matching a user-controlled email field alone.
 
-The My Trips screen currently queries Firestore using the profile email string. A user can alter that value or attempt to read a trip document directly by ID. Access control must be enforced by Firestore Security Rules or a trusted backend.
+## Logout behavior
+The header calls `googleLogout()`, clears localStorage, and reloads the page. Clearing local storage only clears the local cache. A complete production logout design must account for Firebase Auth sign-out if introduced, any server session, token lifecycle, and cached private data.
 
-## Production recommendation
+## Route protection
+Routes are currently declared without a dedicated authenticated route guard. The trip creation page opens a dialog when no local profile exists, and My Trips redirects when the profile is missing. These are UX checks, not security controls.
 
-Use Firebase Authentication with Google as a provider, or validate Google identity tokens on a trusted server. Ensure Firestore rules use the authenticated identity to enforce ownership. Avoid authorizing requests using profile fields supplied by the client.
+The trip detail route accepts `tripId`. Firestore rules must decide whether the caller can read that document. Hard-to-guess IDs are not authorization.
 
-A production identity design should define:
-- provider and OAuth client configuration;
-- authorized JavaScript origins and redirect behavior;
-- token validation and lifecycle;
-- sign-in cancellation and error handling;
-- sign-out and local data cleanup;
-- session persistence and expiration;
-- user account linking and duplicate accounts;
-- Firestore ownership enforcement;
-- account deletion and data retention.
+## Failure cases
+Handle user cancellation, blocked popups, origin mismatch, expired tokens, failed profile requests, missing profile fields, network interruption, logout failure, and restricted localStorage. Current code logs some errors to the console; production UI should be informative without leaking token or provider details.
 
-## Local storage
+## Test data
+Use a designated non-production account and synthetic itineraries. Never paste access tokens, profile JSON, email addresses, or private travel plans into public issues.
 
-The current app stores profile data in local storage. Treat it as untrusted display state:
-- do not store access tokens unless there is a deliberate secure design;
-- do not store unnecessary profile fields;
-- handle malformed or missing JSON safely;
-- clear the app-owned key on logout rather than deleting unrelated origin storage;
-- do not log profile objects;
-- expect local storage to be unavailable in some browser privacy modes.
-
-## Sign-out behavior
-
-The header invokes the Google logout helper, clears local storage, and reloads the page. Review this behavior before production. A robust implementation should sign out from the actual application authentication provider, clear only application-owned state, and verify that protected views no longer render.
-
-## Testing checklist
-
-- [ ] OAuth sign-in succeeds on configured origins.
-- [ ] User cancellation is handled without a broken state.
-- [ ] Provider errors show a useful message.
-- [ ] Missing or malformed local profile does not crash the app.
-- [ ] Sign-out clears application authentication state.
-- [ ] Direct route access without authentication is handled.
-- [ ] Firestore denies unauthenticated reads and writes.
-- [ ] One user cannot access another user's trip by changing local storage or URL.
-- [ ] No access token or private profile fields appear in logs.
-
-See [Database](database.md), [Privacy](privacy.md), and [Security](security.md).
+## Production checklist
+- [ ] OAuth authorized origins match deployment domains.
+- [ ] Consent screen and scopes are reviewed.
+- [ ] Tokens are not logged or committed.
+- [ ] localStorage is not an authorization authority.
+- [ ] Firebase identity is aligned with trusted authentication.
+- [ ] Firestore rules enforce per-user ownership.
+- [ ] Logout clears the intended app session state.
+- [ ] Account and itinerary deletion behavior is defined.
