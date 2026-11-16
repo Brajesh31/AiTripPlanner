@@ -1,46 +1,70 @@
 # Troubleshooting Guide
 
+Diagnose issues with a repeatable environment and sanitized logs. Never share provider keys, OAuth access tokens, Firebase tokens, real user emails, or private itineraries.
+
 ## Installation and Node errors
-Check `node --version` and `npm --version`. Use a Node version compatible with Vite 5. When troubleshooting a broken install, remove local `node_modules/` and run `npm ci` again. Do not casually regenerate the committed lockfile.
+
+Check:
+```bash
+node --version
+npm --version
+```
+Use a Node version compatible with Vite 5. If dependency installation is corrupted, remove local `node_modules/` and rerun `npm ci`. Do not casually regenerate the committed lockfile.
 
 ## Vite cannot resolve an import
-Check spelling and filename capitalization, confirm the file exists under `src/`, and verify the `@` alias in `vite.config.js` and `jsconfig.json`. Restart Vite after config changes.
 
-## Missing environment values
-Confirm `.env` is in the repository root and names match `.env.example`. Restart the dev server after changes. Remember that `VITE_*` values are embedded in browser code.
+Confirm the import path, filename capitalization, package installation, and the `@/` alias in `vite.config.js` and `jsconfig.json`. Production hosts and CI environments may use case-sensitive filesystems.
 
-## Google OAuth origin error
-Check OAuth client ID, authorized JavaScript origins, consent configuration, and actual browser URL including scheme and port. Configure localhost and production domains separately.
+## Environment variable is undefined
 
-## Google profile request fails
-Inspect OAuth response, token scope, network request, and provider error. Do not log or share access tokens. Handle cancellation and denied permissions as recoverable states.
+Confirm `.env` exists in the repository root and the variable name exactly matches the source. Only variables prefixed with `VITE_` are exposed to client code. Restart Vite after changing values. For deployment, set build-time variables in the host and rebuild.
 
-## Gemini request fails
-Check key validity, API enablement, model access, quota, billing, and network restrictions. Confirm model identifier support for the configured SDK. Never expose private keys in public issues.
+## Google OAuth fails
 
-## Gemini returns invalid JSON
-Model output can include markdown fences, extra prose, wrong field names, or missing arrays. Treat it as untrusted. Use schema validation, show a recoverable error, and do not write invalid data to Firestore. Apply a retry limit.
+Check the OAuth client ID, authorized JavaScript origins, consent screen configuration, enabled scopes, popup settings, and browser console. A localhost origin and production domain must be configured separately where required. Test with a non-production account.
+
+## User profile request fails
+
+The current code calls Google's User Info endpoint with an OAuth access token. Check the request status and token validity. Do not paste the access token into an issue. A localStorage profile object is not proof of identity and does not secure Firestore.
+
+## Gemini generation fails
+
+Check the Gemini API key restrictions, enabled API, quota, billing, network response, and model availability in current provider documentation. Remember the key is currently exposed in browser assets. Do not use an unrestricted production credential.
+
+## Gemini output cannot be parsed
+
+The application expects JSON text and calls JSON.parse. Model output can be empty, fenced, truncated, or structurally incomplete. Inspect sanitized response shape only, not private trip content. Validate the root object, hotel array, itinerary object, day entries, and places arrays before saving. See [AI Output Contract](ai-output-contract.md).
 
 ## Firestore permission denied
-Check Firebase project configuration, identity, and Firestore Security Rules. Do not use public read/write rules as a workaround. Client-side email filtering is not authorization.
 
-## My Trips appears empty
-Confirm profile state, Firebase project, saved document fields, and rules. Inspect console and network errors.
+Check Firebase project selection, database initialization, Authentication identity, Security Rules, and document ownership. The current client filters by email from localStorage, which is not a security boundary. Do not loosen rules to public read/write as a quick fix.
 
-## Trip details cannot find a record
-Check the `tripId` path segment, Firestore document ID, project config, and document existence. Handle missing or malformed data without crashing.
+## My Trips is empty
 
-## Places autocomplete does not work
-Verify Maps Platform APIs, billing, browser key restrictions, allowed referrers, and network errors. The helper in `GlobalApi.jsx` is commented out and inactive.
+Check whether the user is signed in, the profile email is present, the document was written, and the Firestore query matches the stored field. Inspect sanitized Firestore errors. Check that the record belongs to the authenticated user under rules.
 
-## Deep route returns 404
-Check `vercel.json` and host rewrite configuration. Client routes should resolve to `index.html`. Confirm deployment output directory is `dist/`.
+## Trip detail page says no document
 
-## Lint fails
-Run `npm run lint` and fix reported issues. Review stale imports, unused variables, missing React keys, and hook dependencies. Avoid broad rule suppression.
+Confirm the URL includes the expected trip ID and the Firestore document exists. Check access rules and network errors. Handle missing documents as an expected not-found state, not a blank page.
 
-## Build fails
-Run `npm run build` and inspect the first meaningful error. Check missing imports, JSX syntax, alias resolution, and package-lock consistency. Lint passing does not guarantee build success.
+## Browser refresh on nested route returns 404
 
-## Useful bug report information
-Include route, browser/version, OS, Node/npm versions, commit, reproduction steps, expected/actual behavior, sanitized console/network output, and whether a clean install reproduces it. Never include keys, tokens, profile data, or private itineraries.
+The host must serve `index.html` for React Router paths. The repository includes a Vercel rewrite, but the deployed configuration must be checked. Verify `/create-trip`, `/my-trips`, and `/view-trip/<id>` directly.
+
+## Lint or build failure
+
+Run commands locally:
+```bash
+npm ci
+npm run lint
+npm run build
+```
+Read the first actionable diagnostic. Do not disable lint rules globally to make CI green. Check Node version, lockfile, import capitalization, and environment-independent build-time assumptions.
+
+## UI layout issue
+
+Inspect responsive width, long destination strings, nested itinerary content, image sizing, and flex/grid constraints. Test at common phone widths and 200% zoom. Review keyboard focus and dialog layering.
+
+## Report a new issue
+
+Include browser/OS, route, commit, reproduction steps, expected/actual behavior, and sanitized Console/Network output. Use synthetic data. Never include credentials or private itineraries.
