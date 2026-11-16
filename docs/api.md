@@ -1,36 +1,73 @@
 # API and External Service Integrations
 
-## Current API boundary
-The repository does not implement its own backend API server or a documented first-party REST endpoint set. It does integrate browser-side SDKs and provider endpoints.
+## 1. First-party API status
 
-Observed status:
-- Gemini SDK: active in `src/service/AIModal.jsx`.
-- Google OAuth: active through `@react-oauth/google`.
-- Google User Info endpoint: called with the OAuth access token.
-- Firebase Firestore: browser SDK reads and writes records.
-- Places autocomplete: imported in the trip creation view.
-- Places REST helper: commented out in `src/service/GlobalApi.jsx`, therefore inactive.
+The repository does not implement its own backend API server or a documented set of first-party REST endpoints. It does integrate browser-side SDKs and provider endpoints. This distinction matters: provider SDK calls are not the same as a secure server-side API owned by this application.
 
-## Gemini
-The app imports `GoogleGenerativeAI`, reads `VITE_GOOGLE_GEMINI_AI_API_KEY`, configures a Gemini model, starts a chat session, and sends a prompt generated from trip preferences. The requested response is JSON containing hotel options and a day-by-day itinerary. The client consumes response text and attempts JSON parsing.
+## 2. Current integrations
 
-Limitations: output is not trusted API data; JSON may be malformed or use unexpected field names; hotel and place claims may be fabricated or stale; a browser-exposed key can be extracted; quotas, model names, and SDK behavior can change.
+| Integration | Current source | Observed usage |
+|---|---|---|
+| Gemini | `src/service/AIModal.jsx` | Browser SDK creates a chat session and generates itinerary text |
+| Google OAuth | `src/main.jsx`, `Header.jsx`, `create-trip/index.jsx` | Browser OAuth sign-in |
+| Google User Info | `create-trip/index.jsx`, `Header.jsx` | Axios GET with OAuth access token |
+| Firebase Firestore | `FirebaseConfig.jsx`, trip pages | Browser SDK reads and writes `AITrips` documents |
+| Google Places | `create-trip/index.jsx`, `GlobalApi.jsx` | Autocomplete package imported; current form uses text input and helper is commented out |
 
-For production, proxy requests through a server endpoint, store the key server-side, enforce quotas, validate requests and responses, and handle rate limits and outages.
+## 3. Gemini request
 
-## Google OAuth and user profile
-The app uses the Google OAuth React integration. After login, the browser requests user information using the access token. The response is stored in local storage under `user`. This is a client-side profile convenience, not a complete secure application session system. Do not treat a local-storage email as proof of authorization. A trusted server must validate identity for privileged operations.
+The AI service reads `VITE_GOOGLE_GEMINI_AI_API_KEY`, creates a GoogleGenerativeAI instance, selects `gemini-1.5-flash`, and configures JSON MIME output with temperature, topP, topK, and max output tokens.
 
-## Firebase
-Firebase initializes in `src/service/FirebaseConfig.jsx`. The trip-creation flow writes to `AITrips`; My Trips queries by email; trip details read by document ID. This is a Firestore SDK integration rather than a first-party REST contract. Security Rules must enforce authenticated ownership.
+The trip form substitutes destination, day count, traveler category, and budget into `AI_PROMPT`, then calls `chatSession.sendMessage(Final_Prompt)`.
 
-## Google Places
-The trip form imports `react-google-places-autocomplete`. The helper in `GlobalApi.jsx` is commented out and is not an active request path. Configure required Google Maps Platform APIs, billing, allowed origins, and key restrictions in Google Cloud.
+Expected output is a JSON object describing `hotel_options` and an `itinerary` grouped by day. The UI consumes fields such as `HotelName`, `HotelAddress`, `Price`, `Rating`, `best_time_to_visit`, and `places`.
 
-## Future first-party endpoints
-If a backend is added, document method, path, purpose, authentication, authorization, request/response schema, validation, status codes, rate limits, retry policy, logging, retention, and versioning for every endpoint.
+The current implementation parses raw model text using JSON.parse. It does not strip Markdown fences or validate a schema before storing. Model output must be treated as untrusted, probabilistic data. See [AI Output Contract](ai-output-contract.md).
 
-## Provider failures
-Distinguish invalid credentials, permission errors, quota exhaustion, rate limits, network failures, timeouts, malformed responses, and outages. User-facing messages must not disclose credentials, tokens, private prompts, or personal data.
+## 4. Google OAuth and user profile request
 
-See [AI Generation](ai-generation.md), [Authentication](authentication.md), [Environment Configuration](environment-configuration.md), and [Security](security.md).
+The application uses `@react-oauth/google` with the client ID from `VITE_GOOGLE_AUTH_CLIENT_ID`. On success, it extracts an access token and requests:
+
+```text
+GET https://www.googleapis.com/oauth2/v1/userinfo
+Authorization: Bearer <OAuth access token>
+Accept: application/json
+```
+
+The profile response is stored in localStorage under the key `user`. Do not log or share full profile responses or access tokens. The local cache is not a trusted authentication mechanism for database authorization.
+
+## 5. Firestore operations
+
+The client code performs:
+- `setDoc` to create a trip document in `AITrips`;
+- `getDocs` on a query filtered by `userEmail`;
+- `getDoc` for a document ID taken from the route parameter.
+
+These operations use the Firebase Web SDK. Firestore Security Rules must enforce authentication and ownership. See [Database](database.md) and [Firestore Data Model](firestore-data-model.md).
+
+## 6. Google Places status
+
+The form imports `react-google-places-autocomplete`, but the current location field is an ordinary text input. `src/service/GlobalApi.jsx` contains an inactive, commented-out request helper. A Places API key appears in `.env.example`, but its current active use is not demonstrated by the inspected helper.
+
+Do not assume autocomplete suggestions or place details are currently fetched.
+
+## 7. Error and response handling
+
+Current async paths do not consistently handle:
+- provider timeouts or network failures;
+- HTTP authentication errors;
+- quota and rate-limit responses;
+- malformed or incomplete model JSON;
+- Firestore permission errors;
+- documents with missing nested fields;
+- expired OAuth access tokens.
+
+Add explicit loading, success, and failure states before describing integrations as production-ready.
+
+## 8. Requirements before adding endpoints
+
+If a backend API is added, document purpose, route, method, auth model, validation, request and response schema, error codes, quota, retry behavior, logging, privacy, retention, secret storage, monitoring, and versioning. Never expose a privileged provider key in browser code.
+
+## 9. Provider documentation
+
+Provider behavior and API versions can change. Consult the current official Google and Firebase documentation before changing SDK usage or deployment configuration. Record the date and version used when a compatibility decision matters.
