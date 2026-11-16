@@ -1,12 +1,11 @@
-# Installation and Local Development
+# 🚀 Installation and Local Development
 
-## 1. Overview
-
+## 📌 1. 🔹 Overview
 AI Trip Planner is a React 18 and Vite application. It uses npm for dependency installation, Vite for development and production builds, React Router for navigation, Firebase for persistence, Google OAuth for sign-in, and the Google Generative AI SDK for itinerary generation.
 
 This guide explains local setup. It does not provision Google Cloud, Firebase, or Vercel resources for you.
 
-## 2. Prerequisites
+## 📌 2. Prerequisites
 
 Install:
 - Git;
@@ -24,7 +23,7 @@ git --version
 
 The repository includes `package-lock.json`. Use `npm ci` to install the lockfile-resolved dependency tree. Do not delete or regenerate the lockfile as a routine troubleshooting step.
 
-## 3. Clone the repository
+## 📌 3. Clone the repository
 
 ```bash
 git clone https://github.com/Brajesh31/AiTripPlanner.git
@@ -38,7 +37,7 @@ git status --short
 npm run
 ```
 
-## 4. Install dependencies
+## 📌 4. Install dependencies
 
 ```bash
 npm ci
@@ -48,7 +47,7 @@ The repository currently tracks a large `node_modules/` directory in Git. This i
 
 Do not commit local dependency changes or generated Vite caches.
 
-## 5. Configure environment variables
+## 📌 5. Configure environment variables
 
 Copy the example file:
 
@@ -73,7 +72,7 @@ The current source directly reads the Gemini key through `import.meta.env`. Goog
 
 **Security:** Vite exposes `VITE_*` values in browser assets. Do not put private credentials in these variables. The current browser-side Gemini key is visible to users. Use provider restrictions for development, and move privileged AI calls to a server-side function before production.
 
-## 6. Start the development server
+## 📌 6. Start the development server
 
 ```bash
 npm run dev
@@ -89,7 +88,7 @@ npm run dev -- --host 0.0.0.0
 
 Do not expose a development server publicly with unrestricted provider keys.
 
-## 7. Available scripts
+## 📌 7. Available scripts
 
 | Command | Purpose |
 |---|---|
@@ -107,7 +106,7 @@ npm run build
 
 The lint command currently uses ESLint 8 and scans JavaScript/JSX files. Existing source contains disabled rules and unused imports; do not assume a passing lint run proves functional correctness.
 
-## 8. Application routes
+## 📌 8. Application routes
 
 The current router defines:
 
@@ -120,7 +119,7 @@ The current router defines:
 
 The header is rendered outside the route provider in `src/main.jsx`. The application also mounts Google OAuth and a toast notification container.
 
-## 9. Provider setup checklist
+## 📌 9. Provider setup checklist
 
 Before testing sign-in or trip generation:
 - create or identify the Firebase project;
@@ -134,7 +133,7 @@ Before testing sign-in or trip generation:
 
 Never paste keys into public issues, screenshots, or chat logs.
 
-## 10. First-run verification
+## 📌 10. First-run verification
 
 1. Start Vite and open the landing page.
 2. Navigate to the trip creation route.
@@ -149,6 +148,6 @@ Never paste keys into public issues, screenshots, or chat logs.
 
 The application currently has limited error handling in several async paths. Use a non-production Firebase project and synthetic trip data while testing.
 
-## 11. Troubleshooting setup
+## 📌 11. Troubleshooting setup
 
 See [Troubleshooting](troubleshooting.md) for dependency, Vite, environment, OAuth, Gemini, Firestore, and route issues. See [Environment Configuration](environment.md) for exact variable behavior.
