@@ -1,402 +1,234 @@
-# ✈️ AI Trip Planner
+# AI Trip Planner 🌍
 
-**AI Trip Planner** is a React and Vite application for creating personalized travel itineraries with generative AI. Visitors can choose a destination, trip duration, budget, and traveler group, sign in with Google, generate an itinerary, save it in Firebase Firestore, revisit saved trips, and view hotel and daily place recommendations.
+AI Trip Planner is a React and Vite application that helps users create AI-generated travel itineraries from a destination, trip duration, budget category, and traveler group. The application uses Google sign-in, Gemini-generated suggestions, and Firebase Cloud Firestore to save and retrieve trip records.
 
-<p align="center">
-  <img src="public/nirvananomads.png" alt="Nirvana Nomads application logo" width="190">
-</p>
+> **Important:** This is an itinerary suggestion tool, not a booking platform. AI-generated hotels, addresses, prices, ratings, images, opening hours, travel times, ticket costs, and safety details may be inaccurate or outdated. Verify important information with official providers. The application does not make reservations or guarantee availability.
 
-<p align="center">
-  A travel-planning assistant that turns preferences into a structured trip draft.
-</p>
+## Current capabilities
 
-> [!IMPORTANT]
-> AI-generated travel plans are suggestions, not verified reservations or live inventory. Hotel details, prices, ratings, coordinates, image URLs, travel times, and opening information may be incomplete or inaccurate. Confirm important details with official providers before relying on them. This application is an independent project and is not affiliated with Google, Firebase, Gemini, or any travel provider.
-
-## 📚 Table of Contents
-
-- [Overview](#-overview)
-- [Current Features](#-current-features)
-- [How It Works](#-how-it-works)
-- [Technology Stack](#-technology-stack)
-- [Application Routes](#-application-routes)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Environment Configuration](#-environment-configuration)
-- [Available Scripts](#-available-scripts)
-- [AI Output and Data Structure](#-ai-output-and-data-structure)
-- [Firebase and Data Security](#-firebase-and-data-security)
-- [Deployment](#-deployment)
-- [Testing and Validation](#-testing-and-validation)
-- [Known Limitations](#-known-limitations)
-- [Documentation](#-documentation)
-- [Contributing](#-contributing)
-- [Security](#-security)
-- [License](#-license)
-- [Maintainer](#-maintainer)
-
-## 🌍 Overview
-
-Planning a trip often involves combining several kinds of information: destination context, traveler preferences, budget, hotel options, and a practical day-by-day itinerary. AI Trip Planner explores how a generative model can help assemble those inputs into a structured travel-plan draft.
-
-The current application is a client-side React interface. It uses Google OAuth for sign-in, a Gemini model for itinerary generation, and Cloud Firestore for storing saved trip documents. Google Places autocomplete is used in the trip creation interface through a React integration.
-
-The project is useful as a learning example for:
-- React component composition and routing;
-- handling asynchronous UI state;
-- connecting a browser application to cloud services;
-- creating structured prompts for generative AI;
-- saving and retrieving user-specific documents;
-- working with environment configuration and deployment rewrites.
-
-It should not be treated as a production travel booking platform without the security, data validation, and operational work described in the documentation.
-
-## ✨ Current Features
-
-| Feature | Current implementation |
+| Capability | Current implementation |
 |---|---|
-| Landing page | Hero section with a trip-creation entry point |
-| Google sign-in | Google OAuth browser flow |
-| Trip preferences | Destination, number of days, budget tier, traveler group |
-| AI itinerary generation | Gemini SDK call from the browser |
-| Hotel recommendations | Rendered from generated trip data |
-| Day-by-day itinerary | Day sections and place cards |
-| Save trips | Firestore `AITrips` collection |
-| My Trips | Query trips using the stored profile email |
-| Trip detail | Dynamic `/view-trip/:tripId` route |
-| Toast feedback | React Hot Toast |
-| UI components | Radix UI primitives with Tailwind styling |
-| Deployment routing | Vercel rewrite to `index.html` |
+| Landing page | React hero page |
+| Trip preferences | Destination, number of days, budget, traveler category |
+| Sign-in | Google OAuth browser flow |
+| AI itinerary | Gemini SDK generates expected JSON response |
+| Trip persistence | Firestore `AITrips` collection |
+| My Trips | Queries saved documents using cached profile email |
+| Trip details | Loads one Firestore document by route ID |
+| Hotel suggestions | Displays generated fields and Google Maps search links |
+| Places by day | Renders itinerary groups and place cards |
+| Places autocomplete | Package imported, but current field is a normal text input |
+| First-party backend API | Not implemented |
 
-Some provider configuration and security controls must be completed in the corresponding Google Cloud and Firebase projects. A feature shown in the UI may fail if the required external service is not configured.
+## Technology stack
 
-## 🧭 How It Works
+- **Frontend:** React 18 and JSX
+- **Build:** Vite 5
+- **Routing:** React Router DOM 6
+- **Styling:** Tailwind CSS 3 and PostCSS
+- **UI primitives:** Radix UI and class-variance-authority
+- **Authentication:** `@react-oauth/google`
+- **AI:** `@google/generative-ai`, configured for `gemini-1.5-flash`
+- **Database:** Firebase Cloud Firestore
+- **HTTP:** Axios
+- **Icons and feedback:** Lucide React, React Icons, React Hot Toast
+- **Hosting configuration:** Vercel SPA rewrite
 
-1. A visitor opens the landing page.
-2. The visitor chooses **Create Trip**.
-3. The trip form collects destination, duration, budget, and traveler group.
-4. If a profile is not present in browser local storage, the app opens the Google sign-in dialog.
-5. The app obtains a Google user profile and stores the profile response in local storage.
-6. A prompt is built from the selected trip preferences.
-7. The Gemini chat session generates itinerary text in the requested JSON format.
-8. The client parses the response and writes the trip document to Firestore.
-9. The app navigates to the generated trip's detail route.
-10. The visitor can later open **My Trips** to retrieve saved trip documents.
+## Getting started
 
-**Important implementation detail:** the current browser code treats local storage as the source of the user's email when querying trips. That is not an authorization boundary. Firestore Security Rules must enforce authenticated document ownership independently of client-side filtering.
+### Prerequisites
 
-## 🧰 Technology Stack
+Install Git, Node.js compatible with the Vite 5 toolchain, npm, and a modern browser.
 
-| Area | Technologies |
-|---|---|
-| UI | React 18, JSX |
-| Development server and build | Vite 5 |
-| Routing | React Router DOM 6 |
-| Styling | Tailwind CSS 3, PostCSS, Autoprefixer |
-| UI primitives | Radix UI Dialog, Popover, Slot, Toast |
-| Class utilities | clsx, class-variance-authority, tailwind-merge |
-| Icons | Lucide React, React Icons |
-| Authentication | Google OAuth React integration |
-| AI | Google Generative AI SDK |
-| Data persistence | Firebase Cloud Firestore |
-| HTTP requests | Axios |
-| Notifications | React Hot Toast |
-| Hosting configuration | Vercel rewrite |
-
-The exact dependency versions and package scripts are maintained in `package.json` and `package-lock.json`.
-
-## 🗺️ Application Routes
-
-| Route | Screen | Responsibility |
-|---|---|---|
-| `/` | Landing | Introduces the app and links to trip creation |
-| `/create-trip` | Create Trip | Collects trip preferences and starts generation |
-| `/my-trips` | My Trips | Lists saved trips for the locally stored profile |
-| `/view-trip/:tripId` | Trip Details | Reads a Firestore document and renders the itinerary |
-
-Routes are declared in `src/main.jsx`. The Vercel configuration rewrites application paths to the Vite entry document so the React router can resolve deep links.
-
-## 🗂️ Project Structure
-
-```text
-AiTripPlanner/
-├── public/
-│   ├── logo.svg
-│   ├── nirvananomads.png
-│   ├── nn.png
-│   └── placeholder.jpg
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── custom/
-│   │   │   ├── Header.jsx
-│   │   │   └── Hero.jsx
-│   │   └── ui/
-│   │       ├── button.jsx
-│   │       ├── dialog.jsx
-│   │       ├── input.jsx
-│   │       ├── popover.jsx
-│   │       ├── toast.jsx
-│   │       ├── toaster.jsx
-│   │       └── use-toast.js
-│   ├── constants/
-│   │   └── Options.jsx
-│   ├── create-trip/
-│   │   └── index.jsx
-│   ├── my-trips/
-│   │   ├── components/
-│   │   │   └── UserTripCardItem.jsx
-│   │   └── index.jsx
-│   ├── service/
-│   │   ├── AIModal.jsx
-│   │   ├── FirebaseConfig.jsx
-│   │   └── GlobalApi.jsx
-│   ├── view-trip/
-│   │   └── [tripId]/
-│   │       ├── Index.jsx
-│   │       └── components/
-│   │           ├── Footer.jsx
-│   │           ├── Hotels.jsx
-│   │           ├── InfoSection.jsx
-│   │           ├── PlaceCardItem.jsx
-│   │           └── PlacesToVisit.jsx
-│   ├── App.css
-│   ├── App.jsx
-│   ├── index.css
-│   ├── lib/
-│   │   └── utils.js
-│   └── main.jsx
-├── docs/
-├── .env.example
-├── .editorconfig
-├── components.json
-├── index.html
-├── jsconfig.json
-├── package-lock.json
-├── package.json
-├── postcss.config.js
-├── tailwind.config.js
-├── vercel.json
-└── vite.config.js
-```
-
-Generated dependencies belong in the local `node_modules/` directory and should not be committed. The npm lockfile is committed for reproducible installation.
-
-## 🚀 Getting Started
-
-### 1. Prerequisites
-
-- Node.js compatible with the Vite version used by this repository.
-- npm.
-- Git.
-- A modern browser.
-- Google Cloud and Firebase project configuration for provider-backed features.
-
-This repository uses **npm**. Do not use Bun or Yarn for the documented workflow.
-
-### 2. Clone
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Brajesh31/AiTripPlanner.git
 cd AiTripPlanner
 ```
 
-### 3. Install dependencies
+### 2. Install dependencies
 
 ```bash
 npm ci
 ```
 
-### 4. Create local environment file
+Use the committed lockfile for reproducible installation. Do not commit a local `node_modules/` directory.
 
-PowerShell:
+### 3. Configure environment variables
+
+Copy the example file.
+
+**PowerShell**
 ```powershell
 Copy-Item .env.example .env
 ```
 
-macOS / Linux:
+**macOS / Linux**
 ```bash
 cp .env.example .env
 ```
 
-Add the appropriate development values in `.env`. Do not commit this populated file.
+Set the values described in [Environment Configuration](docs/environment.md):
 
-### 5. Start development server
+```dotenv
+VITE_GOOGLE_AUTH_CLIENT_ID=your-browser-oauth-client-id
+VITE_GOOGLE_GEMINI_AI_API_KEY=your-restricted-development-key
+VITE_GOOGLE_PLACES_API_KEY=your-restricted-browser-key
+```
+
+**Security warning:** Vite exposes all `VITE_*` values in the browser bundle. The current Gemini integration uses a browser-visible key. Do not use a privileged key here. Move AI generation to a trusted server-side function before production. Firebase web configuration is hard-coded in the current service module and must be protected with correctly configured Firestore Security Rules and provider restrictions.
+
+### 4. Start development
 
 ```bash
 npm run dev
 ```
 
-Open the local URL printed by Vite, normally `http://localhost:5173`.
+Open the local URL printed by Vite, commonly `http://localhost:5173`.
 
-### 6. Build for production
+## Available scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Build optimized output into `dist/` |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint with the current repository script |
+
+Before submitting changes:
 
 ```bash
+npm run lint
+npm run build
+```
+
+## Application routes
+
+| Route | Component | Description |
+|---|---|---|
+| `/` | `App` / `Hero` | Landing page |
+| `/create-trip` | `CreateTrip` | Collect preferences and generate a trip |
+| `/view-trip/:tripId` | `ViewTrip` | Read and render one saved trip |
+| `/my-trips` | `MyTrips` | List saved trips for the cached profile |
+
+## Project structure
+
+```text
+AiTripPlanner/
+├── public/                         # Public images and static assets
+├── src/
+│   ├── components/
+│   │   ├── custom/                 # Header and Hero
+│   │   └── ui/                     # Button, dialog, input, popover, toast
+│   ├── constants/                  # Budget, traveler, and prompt options
+│   ├── create-trip/                 # Preference and generation flow
+│   ├── my-trips/                    # Saved-trip listing
+│   ├── service/                     # Gemini, Firebase, provider helpers
+│   ├── view-trip/[tripId]/          # Trip detail page and components
+│   ├── App.jsx                      # Landing component
+│   ├── main.jsx                     # Entry, providers, and routes
+│   ├── App.css
+│   └── index.css
+├── docs/                            # Technical and operational guides
+├── .github/                         # Workflow and PR guidance
+├── .env.example                     # Placeholder browser configuration
+├── package.json
+├── package-lock.json
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── components.json
+├── jsconfig.json
+├── vercel.json
+└── index.html
+```
+
+## How trip generation works
+
+1. The user opens Create Trip and enters destination, duration, budget, and traveler category.
+2. The app checks for a cached Google profile in localStorage.
+3. If no profile exists, the user can sign in with Google OAuth.
+4. The app requests profile data from Google's User Info endpoint.
+5. User input is interpolated into the AI prompt.
+6. The browser calls Gemini and receives text expected to contain JSON.
+7. The app parses the response and writes user selection, trip data, email, and ID to Firestore.
+8. The browser navigates to `/view-trip/:tripId`.
+9. The detail page reads the document and renders hotel and itinerary sections.
+10. My Trips queries records filtered by the cached profile email.
+
+This describes the current client implementation. It is not a production-grade identity or authorization design.
+
+## Security and deployment warnings
+
+The repository has important production hardening requirements:
+
+- The Gemini API key is read through a `VITE_*` variable and used in browser code. It is exposed to visitors. Move privileged AI requests behind a server-side function and rotate keys that have escaped their intended scope.
+- Firebase web configuration is hard-coded in `src/service/FirebaseConfig.jsx`. Firebase web config is not a substitute for Firestore Security Rules.
+- The app stores a Google profile object in localStorage. Client-side state can be forged and must not authorize Firestore reads or writes.
+- The Google OAuth profile flow is not demonstrated as a Firebase Authentication session. Align identity before enforcing Firestore ownership by UID.
+- The reviewed repository tree does not contain a Firestore rules file. Do not use real user data until access rules are created and tested.
+- Gemini output is parsed with `JSON.parse` but is not fully schema-validated before persistence.
+- Generated trip data is probabilistic. Verify hotel names, addresses, prices, opening times, transport, and attraction information independently.
+
+Read [Security](docs/security.md), [Authentication](docs/authentication.md), [Firestore Data Model](docs/firestore-data-model.md), and [AI Output Contract](docs/ai-output-contract.md).
+
+## Testing and validation
+
+The project includes ESLint and a Vite production build. A dedicated unit, integration, or browser automation suite was not present in the source tree reviewed for this documentation.
+
+```bash
+npm ci
 npm run lint
 npm run build
 npm run preview
 ```
 
-See [Installation Guide](docs/installation.md) for detailed setup, environment, provider, and troubleshooting instructions.
+Manually check all routes, OAuth behavior, Firestore permissions, generation errors, malformed AI output, mobile layouts, keyboard navigation, and direct route refresh. See [Testing](docs/testing.md).
 
-## 🔐 Environment Configuration
+## Documentation
 
-The current `.env.example` includes:
+Start with [docs/README.md](docs/README.md).
 
-| Variable | Purpose | Important note |
-|---|---|---|
-| `VITE_GOOGLE_AUTH_CLIENT_ID` | OAuth browser client ID | Configure authorized origins |
-| `VITE_GOOGLE_GEMINI_AI_API_KEY` | Gemini client SDK key | Public in the built frontend, not suitable for a privileged secret |
-| `VITE_GOOGLE_PLACES_API_KEY` | Places integration key | Restrict by allowed websites and enabled APIs |
-
-Vite exposes all `VITE_*` variables in client-side code. Never treat them as confidential server secrets. The current Firebase configuration is hard-coded in `src/service/FirebaseConfig.jsx`; document and configure the Firebase project carefully.
-
-Production recommendations:
-- move Gemini calls behind a server-side endpoint;
-- keep privileged credentials in the hosting platform's secret manager;
-- restrict browser API keys by HTTP referrer and API;
-- use Firestore Security Rules to require authenticated ownership;
-- never rely on local-storage email values for access control;
-- rotate any exposed key if it has been used outside its intended restrictions.
-
-Read [Environment Configuration](docs/environment-configuration.md) and [Security](docs/security.md).
-
-## 📜 Available Scripts
-
-| Command | Purpose |
+| Guide | Focus |
 |---|---|
-| `npm ci` | Install exact dependency tree from lockfile |
-| `npm run dev` | Start Vite development server |
-| `npm run lint` | Run ESLint with zero warning tolerance |
-| `npm run build` | Generate production build in `dist/` |
-| `npm run preview` | Preview the generated production build locally |
+| [Installation](docs/installation.md) | Local setup and scripts |
+| [Architecture](docs/architecture.md) | Components, routes, and service boundaries |
+| [Development](docs/development.md) | Code structure and workflow |
+| [API and Services](docs/api.md) | Gemini, OAuth, Firebase, and Places |
+| [Database](docs/database.md) | Firestore collection and document behavior |
+| [Environment](docs/environment.md) | Vite variables and provider restrictions |
+| [AI Output Contract](docs/ai-output-contract.md) | Model prompt and expected JSON |
+| [Authentication](docs/authentication.md) | Google OAuth and identity limitations |
+| [Firestore Data Model](docs/firestore-data-model.md) | Data ownership and rules expectations |
+| [Privacy](docs/privacy.md) | Profile and trip data lifecycle |
+| [Security](docs/security.md) | Key exposure and production risks |
+| [Deployment](docs/deployment.md) | Build and hosting |
+| [Deployment Operations](docs/deployment-operations.md) | Vercel environment, route fallback, rollback |
+| [Accessibility](docs/accessibility.md) | Forms, dialogs, focus, generated content |
+| [Performance](docs/performance.md) | Bundles, SDKs, images, latency |
+| [Testing](docs/testing.md) | Automated and manual test strategy |
+| [Maintenance](docs/maintenance.md) | Dependency, configuration, and repository upkeep |
+| [Troubleshooting](docs/troubleshooting.md) | Common local and provider issues |
+| [FAQ](docs/faq.md) | Common questions |
 
-## 🤖 AI Output and Data Structure
+## Roadmap
 
-The Gemini prompt requests a JSON object containing:
-- trip details;
-- hotel options;
-- hotel names, addresses, prices, image URLs, coordinates, ratings, and descriptions;
-- day-wise itinerary entries;
-- place names, descriptions, image URLs, coordinates, ticket pricing, and travel-time estimates.
+See [ROADMAP.md](ROADMAP.md) for planned architecture, security, test, and product improvements. Planned work is not current functionality.
 
-The UI currently expects fields such as `hotel_options`, `itinerary`, `best_time_to_visit`, `places`, `HotelName`, `HotelAddress`, `Price`, and `Rating`.
+## Contributing
 
-Model responses are not guaranteed to match this shape. The current implementation attempts JSON parsing and handles parse errors in the trip creation flow, but it does not provide a complete schema-validation layer. AI-generated information may be inaccurate, stale, or fabricated. Validate travel-critical information independently.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Contributions should include lint/build validation, route testing, security review for provider changes, and documentation.
 
-## 🔥 Firebase and Data Security
+## License
 
-The application stores generated trip documents in the Firestore `AITrips` collection. The current client writes fields including:
-- `id`;
-- `userEmail`;
-- `userSelection`;
-- `tripData`.
+Released under the [MIT License](LICENSE).
 
-The My Trips screen queries documents by `userEmail`. This client-side query does not protect data. Configure Firestore rules so a signed-in identity can read and write only its own records. The repository currently does not include Firestore rules, indexes, or automated security-rule tests.
-
-Do not deploy unrestricted Firestore rules. See [Database](docs/database.md), [Authentication](docs/authentication.md), and [Privacy](docs/privacy.md).
-
-## 🚢 Deployment
-
-The repository contains `vercel.json` with a rewrite to `/index.html` for browser-history routes. A Vite deployment must build the project and publish the `dist/` directory.
-
-Before deployment:
-- configure environment values in the hosting provider;
-- verify OAuth authorized origins and redirect settings;
-- restrict browser API keys;
-- verify Firebase project and Firestore rules;
-- test all routes directly, including a refreshed trip-detail URL;
-- check provider quotas, billing, and API availability;
-- confirm no secret is embedded in the production bundle.
-
-See [Deployment](docs/deployment.md).
-
-## 🧪 Testing and Validation
-
-Run:
-
-```bash
-npm run lint
-npm run build
-```
-
-Manual browser checks should cover:
-- landing and route navigation;
-- Google sign-in and sign-out behavior;
-- missing and valid trip form inputs;
-- Gemini success, malformed output, quota, and network failure;
-- Firestore save, list, read, and permission-denied behavior;
-- invalid or missing trip IDs;
-- mobile and desktop layouts;
-- keyboard navigation and accessible dialog behavior.
-
-The current repository does not include a dedicated automated component, browser, or Firestore rules test suite. A successful Vite build does not verify external provider configuration.
-
-## ⚠️ Known Limitations
-
-- Gemini is called directly from browser code with a `VITE_*` key.
-- Firebase configuration is hard-coded in the client source.
-- Firestore rules and indexes are not included in the repository.
-- Local storage is used to retain a Google profile response.
-- My Trips filters by client-provided email, which is not an authorization boundary.
-- Generated JSON is not validated against a formal runtime schema before persistence.
-- Provider errors and loading states are not comprehensively handled in every flow.
-- Place and hotel image display currently uses a shared local placeholder in inspected view components.
-- A commented-out Places REST helper exists in `GlobalApi.jsx`; it is not an active integration.
-- No booking, reservation, payment, or live availability service is implemented.
-
-These limitations should be resolved before representing the application as production-ready.
-
-## 📖 Documentation
-
-The `docs/` folder contains implementation-specific guides for development, integrations, data handling, and operations.
-
-| Guide | Description |
-|---|---|
-| [Documentation Index](docs/README.md) | Complete guide directory and project boundaries |
-| [Installation](docs/installation.md) | Prerequisites, npm setup, environment, and local run |
-| [Architecture](docs/architecture.md) | Routes, modules, integrations, and data flow |
-| [Development](docs/development.md) | React conventions and contribution workflow |
-| [Authentication](docs/authentication.md) | Google OAuth flow and identity boundaries |
-| [AI Generation](docs/ai-generation.md) | Gemini prompt, response parsing, validation, and failures |
-| [Data Model](docs/data-model.md) | Saved trip fields and expected itinerary structure |
-| [Environment Configuration](docs/environment-configuration.md) | Browser variables, API restrictions, and Firebase config |
-| [API Integrations](docs/api.md) | Google, Gemini, Places, and Firebase integrations |
-| [Database](docs/database.md) | Firestore collection, ownership, and schema |
-| [Deployment](docs/deployment.md) | Vercel build, environment, rewrites, and verification |
-| [Security](docs/security.md) | Keys, identity, Firestore rules, AI output, reporting |
-| [Privacy](docs/privacy.md) | User profiles, itineraries, retention, and deletion |
-| [Accessibility](docs/accessibility.md) | Keyboard, forms, dialogs, and responsive review |
-| [Testing](docs/testing.md) | Lint, build, manual flows, and future automation |
-| [Performance](docs/performance.md) | Bundle, image, and provider latency review |
-| [Maintenance](docs/maintenance.md) | Dependencies, provider configuration, and workflows |
-| [Release Process](docs/release-process.md) | Release checks, deployment verification, and rollback |
-| [Troubleshooting](docs/troubleshooting.md) | Local setup and provider problem diagnosis |
-| [FAQ](docs/faq.md) | Common application questions |
-
-## 🤝 Contributing
-
-Contributions that improve reliability, code quality, accessibility, security, documentation, and user experience are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
-
-Do not include private API credentials, Firebase tokens, personal information, or real travel records in commits, issues, or screenshots.
-
-## 🔒 Security
-
-If you discover a security issue, follow [SECURITY.md](SECURITY.md). Do not publish active credentials or private user itineraries in a public issue.
-
-## 📄 License
-
-This project is distributed under the MIT License. See [LICENSE](LICENSE) for the full terms.
-
-## 👨‍💻 Maintainer
+## Maintainer
 
 **Brajesh Kumar**  
 GitHub: [@Brajesh31](https://github.com/Brajesh31)
 
 ---
 
-<p align="center">
-  Built as an AI-assisted travel planning project. Verify real-world travel details with official providers before making decisions.
-</p>
-
-Last updated: 2026-11-16 02:59 UTC
+*AI-generated travel suggestions are not verified travel advice. Confirm important details with official sources before making travel decisions.*
