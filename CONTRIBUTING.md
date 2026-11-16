@@ -1,8 +1,8 @@
-# Contributing Guide
+# 🤝 Contributing Guide
 
 Thank you for considering a contribution to AI Trip Planner. This repository is a React/Vite learning project that generates travel itinerary suggestions using Google and Firebase services. Contributions should improve correctness, usability, accessibility, reliability, security, or maintainability.
 
-## 1. Understand the project first
+## 📌 1. Understand the project first
 
 Read the [documentation index](docs/README.md), especially:
 - [Architecture](docs/architecture.md)
@@ -16,7 +16,7 @@ Read the [documentation index](docs/README.md), especially:
 
 The current app uses React 18, Vite 5, React Router, Tailwind CSS, Google OAuth, Gemini SDK, Firebase Firestore, and Axios. It does not contain a first-party backend API or a dedicated automated browser test suite.
 
-## 2. Good contribution areas
+## 📌 2. Good contribution areas
 
 - form validation and input normalization;
 - safe model output parsing and schema validation;
@@ -30,7 +30,7 @@ The current app uses React 18, Vite 5, React Router, Tailwind CSS, Google OAuth,
 
 Avoid adding dependencies or infrastructure without describing the problem they solve and the maintenance cost they introduce.
 
-## 3. Local setup
+## 📌 3. Local setup
 
 ```bash
 git clone https://github.com/Brajesh31/AiTripPlanner.git
@@ -46,7 +46,7 @@ Start the development server:
 npm run dev
 ```
 
-## 4. Development standards
+## 📌 4. Development standards
 
 - Keep React components focused and readable.
 - Keep provider and persistence logic in appropriate service boundaries.
@@ -59,7 +59,7 @@ npm run dev
 - Keep user profile and trip data out of console logs.
 - Ensure Firestore ownership is enforced by rules, not client-side filters.
 
-## 5. Provider and data changes
+## 📌 5. Provider and data changes
 
 Changes to Gemini prompts or response fields must update the [AI Output Contract](docs/ai-output-contract.md), response validation, detail renderers, and compatibility expectations for already saved trips.
 
@@ -67,11 +67,11 @@ Changes to sign-in must update the [Authentication](docs/authentication.md) and 
 
 Never commit OAuth tokens, Gemini keys, Firebase service account credentials, production database exports, or real itineraries.
 
-## 6. UI and accessibility expectations
+## 📌 6. UI and accessibility expectations
 
 For UI changes, test narrow and wide viewports, keyboard focus, labels, dialog behavior, selected states, error announcements, and reduced-motion settings. Generated itinerary cards must remain understandable when content is long, incomplete, or malformed.
 
-## 7. Validation requirements
+## 📌 7. Validation requirements
 
 Run:
 
@@ -84,7 +84,7 @@ npm run preview
 
 Then test affected routes and failure scenarios. The repository does not currently contain a dedicated automated test suite. Do not claim unit or browser tests passed unless such tests have actually been added and run.
 
-## 8. Pull request requirements
+## 📌 8. Pull request requirements
 
 A useful pull request describes:
 - problem and user impact;
@@ -99,15 +99,15 @@ A useful pull request describes:
 
 Use the pull request template in `.github/PULL_REQUEST_TEMPLATE.md`.
 
-## 9. Commit hygiene
+## 📌 9. Commit hygiene
 
 Keep commits focused. Do not commit `.env`, `node_modules/`, `dist/`, editor caches, operating-system files, logs, credentials, or private user data. Keep `package-lock.json` synchronized with `package.json`.
 
-## 10. Asset licensing
+## 📌 10. Asset licensing
 
 Use original or appropriately licensed assets. Verify source, license, attribution, and commercial-use terms. Do not assume that an image found online can be redistributed.
 
-## 11. Maintainer
+## 📌 11. Maintainer
 
 **Brajesh Kumar**  
 GitHub: [@Brajesh31](https://github.com/Brajesh31)
