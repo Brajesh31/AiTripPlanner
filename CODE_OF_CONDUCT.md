@@ -2,29 +2,36 @@
 
 ## Our commitment
 
-The AI Trip Planner project aims to maintain a respectful, inclusive, and constructive environment for people contributing across different backgrounds and experience levels.
+The AI Trip Planner project welcomes constructive participation from people with different backgrounds, identities, and experience levels. We aim to keep repository discussions respectful, practical, and focused on making the project safer and more useful.
 
 ## Expected behavior
 
-Participants are expected to communicate respectfully, explain disagreements with evidence, provide actionable feedback, accept good-faith corrections, respect privacy and licensing, keep discussions focused, use synthetic data in examples, and protect credentials and user travel information.
+Participants are expected to:
+- be respectful, patient, and constructive;
+- discuss technical disagreements with evidence;
+- provide actionable feedback;
+- accept good-faith corrections;
+- respect privacy, licensing, and intellectual property;
+- avoid assumptions about other contributors' skills or intent;
+- keep discussions focused on the application and its users.
 
 ## Unacceptable behavior
 
-Examples include harassment, discrimination, threats, personal attacks, doxxing, publishing credentials or private itineraries, persistent disruption of reviews, and knowingly submitting malicious changes or deceptive claims.
+Harassment, discrimination, threats, personal attacks, doxxing, disclosure of credentials or private itineraries, persistent disruption, and knowingly submitting malicious code are not acceptable.
 
 ## Scope
 
-This code applies to repository issues, pull requests, reviews, discussions, and communication directly associated with the project.
+This code applies to issues, pull requests, reviews, repository discussions, and other spaces directly associated with the project.
 
 ## Reporting
 
-Report conduct concerns privately to **Brajesh Kumar** ([ @Brajesh31 ](https://github.com/Brajesh31)) through GitHub. Include relevant context and links. Do not publish private information in public issues.
+Report conduct concerns privately to **Brajesh Kumar** ([GitHub @Brajesh31](https://github.com/Brajesh31)). Include relevant links and context. Do not publish private information in a public issue.
 
-Reports will be reviewed as fairly and discreetly as possible. The maintainer may request clarification, remove inappropriate content, close discussions, or restrict participation when necessary to protect the community.
+Reports will be reviewed as fairly and discreetly as possible. The maintainer may request clarification, remove inappropriate content, close discussions, or restrict participation where needed to protect the project.
 
 ## Maintainer responsibility
 
-The maintainer is responsible for clarifying expectations and applying this code consistently. Decisions should focus on observable behavior and its impact on project participation.
+The maintainer is responsible for clarifying project expectations and applying this code consistently. Decisions should consider observable behavior and the effect on constructive participation.
 
 ## Attribution
 
