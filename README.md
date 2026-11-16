@@ -349,30 +349,30 @@ These limitations should be resolved before representing the application as prod
 
 ## 📖 Documentation
 
-The `docs/` directory contains detailed guides:
+The `docs/` folder contains implementation-specific guides for development, integrations, data handling, and operations.
 
 | Guide | Description |
 |---|---|
-| [Documentation Index](docs/README.md) | Full guide directory and project scope |
-| [Installation](docs/installation.md) | Setup, npm commands, environment, and local run |
+| [Documentation Index](docs/README.md) | Complete guide directory and project boundaries |
+| [Installation](docs/installation.md) | Prerequisites, npm setup, environment, and local run |
 | [Architecture](docs/architecture.md) | Routes, modules, integrations, and data flow |
-| [Development](docs/development.md) | Coding conventions and contribution workflow |
-| [API](docs/api.md) | Google, Gemini, Places, and Firebase integrations |
-| [Database](docs/database.md) | Firestore collection and current document structure |
-| [Authentication](docs/authentication.md) | OAuth flow and identity boundaries |
-| [AI Generation](docs/ai-generation.md) | Prompt, response handling, validation, and failure modes |
+| [Development](docs/development.md) | React conventions and contribution workflow |
+| [Authentication](docs/authentication.md) | Google OAuth flow and identity boundaries |
+| [AI Generation](docs/ai-generation.md) | Gemini prompt, response parsing, validation, and failures |
 | [Data Model](docs/data-model.md) | Saved trip fields and expected itinerary structure |
-| [Environment Configuration](docs/environment-configuration.md) | Environment variables and key restrictions |
-| [Deployment](docs/deployment.md) | Vercel build and route rewrites |
-| [Security](docs/security.md) | Keys, Firestore rules, AI output, and reporting |
+| [Environment Configuration](docs/environment-configuration.md) | Browser variables, API restrictions, and Firebase config |
+| [API Integrations](docs/api.md) | Google, Gemini, Places, and Firebase integrations |
+| [Database](docs/database.md) | Firestore collection, ownership, and schema |
+| [Deployment](docs/deployment.md) | Vercel build, environment, rewrites, and verification |
+| [Security](docs/security.md) | Keys, identity, Firestore rules, AI output, reporting |
 | [Privacy](docs/privacy.md) | User profiles, itineraries, retention, and deletion |
-| [Accessibility](docs/accessibility.md) | Keyboard, dialogs, forms, and responsive review |
-| [Testing](docs/testing.md) | Lint, build, manual and planned automated tests |
-| [Troubleshooting](docs/troubleshooting.md) | Common setup and provider issues |
+| [Accessibility](docs/accessibility.md) | Keyboard, forms, dialogs, and responsive review |
+| [Testing](docs/testing.md) | Lint, build, manual flows, and future automation |
 | [Performance](docs/performance.md) | Bundle, image, and provider latency review |
-| [Maintenance](docs/maintenance.md) | Dependency, workflow, and repository upkeep |
-| [Release Process](docs/release-process.md) | Change review and release checklist |
-| [FAQ](docs/faq.md) | Common project questions |
+| [Maintenance](docs/maintenance.md) | Dependencies, provider configuration, and workflows |
+| [Release Process](docs/release-process.md) | Release checks, deployment verification, and rollback |
+| [Troubleshooting](docs/troubleshooting.md) | Local setup and provider problem diagnosis |
+| [FAQ](docs/faq.md) | Common application questions |
 
 ## 🤝 Contributing
 
