@@ -1,29 +1,37 @@
 # Changelog
 
-All notable repository changes should be recorded here. Entries describe this repository and its implementation, not external provider releases.
+This changelog records changes to the AI Trip Planner repository. It does not represent official Google, Firebase, or travel-provider product releases.
 
 ## Unreleased
 
-### Documentation
-- Expanded the README with current functionality, technology stack, routes, architecture, setup, environment, Firestore, AI output, deployment, validation, and known limitations.
-- Added a documentation index and detailed installation, architecture, development, API, database, authentication, AI generation, data model, and environment configuration guides.
-- Added dedicated testing, privacy, accessibility, performance, maintenance, release, troubleshooting, and FAQ guides.
-- Expanded contribution, security, support, and community conduct policies.
+### Added
+- Expanded installation, architecture, API, database, and application-flow documentation.
+- Added dedicated guides for environment variables, AI output contract, authentication, Firestore data model, privacy, accessibility, performance, deployment operations, testing, and maintenance.
+- Expanded README with actual routes, stack, source layout, setup steps, and production limitations.
+- Expanded contributor, security, support, code-of-conduct, and roadmap guidance.
 
-### Repository hygiene
-- Identified a large committed `node_modules/` tree containing generated dependency and Vite cache files.
-- Planned removal of generated dependencies from version control while preserving the npm lockfile.
-- Added a requirement to ignore local environment files, dependencies, build output, and editor/OS artifacts.
+### Changed
+- Clarified the difference between Google OAuth profile data in localStorage and trusted Firebase Authentication identity.
+- Documented that the Gemini key is exposed when used through a Vite client variable.
+- Documented the need for Firestore Security Rules and verified ownership enforcement.
+- Documented the fact that Google Places autocomplete is imported but the current location field is a standard input.
+- Documented the current raw JSON parsing and lack of full schema validation for Gemini output.
+- Clarified that AI suggestions are not verified prices, hotel availability, operating hours, or travel advice.
 
-### Known implementation limitations
-- Gemini is currently invoked from browser code using a `VITE_*` key.
-- Firebase web configuration is hard-coded in client source.
-- Local storage is used for a Google profile response.
-- My Trips filters by client-provided email; this is not authorization.
-- Firestore rules and rules tests are not included in the repository tree.
-- AI output is parsed without complete runtime schema validation.
-- No dedicated end-to-end or Firestore security test suite is present.
-- The application does not implement booking, confirmed availability, or payment flows.
+### Known risks and limitations
+- The Gemini key is used in browser code and should be moved behind a server-side boundary.
+- Firebase web configuration is hard-coded; Firestore rules and restrictions remain essential.
+- localStorage profile values are client-controlled and must not authorize database access.
+- No Firestore rules file was found in the reviewed repository tree.
+- Gemini output is parsed without a complete schema validation layer.
+- There is no dedicated unit, integration, or browser automation suite in the reviewed source tree.
+- The repository tracks a very large `node_modules/` directory. A deliberate bulk cleanup remains necessary.
+- The app does not book hotels or guarantee generated travel information.
 
-## Previous state
-The repository already contained the React/Vite application, npm lockfile, Firebase and Google integration code, Vercel SPA rewrite, and initial project governance files.
+## Earlier repository baseline
+
+- React 18 and Vite single-page application.
+- Google OAuth browser sign-in.
+- Gemini-based itinerary-generation prototype.
+- Firestore trip create, list, and detail operations.
+- Vercel rewrite for browser-history routes.
