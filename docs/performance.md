@@ -1,35 +1,42 @@
-# Performance Guide
+# Performance and Frontend Efficiency
 
-## Performance profile
-The application is a Vite React SPA with provider and UI dependencies. Cost areas can include the React bundle, icons, Firebase SDK, Google integrations, and external Gemini requests. Performance must be measured on a production build, not inferred from source size.
+## Scope
+Performance depends on JavaScript bundle size, React rendering, image assets, third-party SDKs, network latency, Gemini generation, OAuth, and Firestore requests. Measure production builds under a documented browser, network, and device profile rather than relying on a development server.
 
-## Initial load
-Inspect generated `dist/` output and the browser Network panel. Identify JavaScript chunk sizes, CSS size, image sizes, fonts, external resources, render-blocking requests, and unused dependencies. Consider route-level lazy loading if the initial route downloads screens the visitor has not opened.
+## Current cost centers
+Dependencies include React, Firebase, Gemini SDK, Axios, Google OAuth, Places packages, multiple icon packages, Radix UI components, Tailwind utilities, and toast libraries. Provider SDKs are imported into browser code. The initial Gemini service contains a lengthy embedded Las Vegas conversation which increases source and potentially bundle cost and influences prompt context.
+
+## Build output
+```bash
+npm ci
+npm run build
+```
+Vite writes production output to `dist/`. Inspect JavaScript and media sizes. Do not publish `node_modules/` as part of the website.
+
+## Route-level splitting
+Routes are statically imported in `src/main.jsx`. A future optimization could use React.lazy and Suspense, but measure first and provide loading states. Verify direct route navigation after splitting.
 
 ## Images
-The `public/` directory contains branding and placeholder images. Optimize dimensions and compression for rendered layouts. Avoid large originals in small cards. Add explicit dimensions or aspect ratios to reduce layout shift. Validate model-generated image URLs and provide local fallbacks.
+Trip cards currently use local placeholder imagery. Check dimensions, compression, and displayed size. Use responsive variants where useful and stable dimensions/aspect ratios to reduce layout shift. Do not assume model-supplied image URLs are valid.
 
 ## Provider latency
-Gemini generation, OAuth profile requests, Places autocomplete, and Firestore operations introduce network latency. Show loading states, avoid duplicate requests, handle timeouts, and keep unrelated UI responsive. Do not retry non-idempotent writes blindly.
+Gemini, OAuth, and Firestore calls depend on external services. Provide loading and error states, avoid duplicate requests, protect against stale responses, and use bounded timeouts/retries. Do not retry expensive generation indefinitely.
 
 ## React rendering
-Avoid repeated state updates while iterating Firestore documents. Use stable keys and derived state where practical. Keep components focused to avoid unrelated work.
+Avoid repeated state updates inside loops when one accumulated result can be set once. Use stable keys and review effect dependencies instead of disabling hook rules broadly. Add memoization only when measurement shows value.
 
-## Bundle review
-Use Vite build output to inspect chunks. If bundle analysis tooling is introduced, document it and avoid committing reports unless needed. Lazy-load route screens only where measurement shows a benefit.
-
-## Caching and hosting
-Confirm caching headers at deployment. When an update appears stale, inspect the deployed commit, response headers, CDN cache, and browser cache before editing source.
+## Dependency hygiene
+The repository currently tracks a very large `node_modules/` tree. Generated dependencies do not belong in source control. Preserve `package-lock.json`, ignore `node_modules/`, and install with `npm ci`. Audit duplicates and unused packages before removing dependencies.
 
 ## Measurement
-Record deployed URL, commit, date, browser, device class, network settings, tool, repeated results, largest resources, and layout shifts. Do not claim Core Web Vitals results without reproducible measurements.
+Record test URL/commit, browser, device class, network/CPU conditions, tool version, date, asset sizes, route measured, and repeated results. Do not claim a performance score without evidence.
 
 ## Checklist
-- [ ] Production build completes.
-- [ ] Large images are appropriately sized.
-- [ ] Unnecessary packages and resources are not added.
-- [ ] Initial route avoids unneeded feature code where splitting is useful.
-- [ ] Provider requests have loading and timeout behavior.
-- [ ] Duplicate generation or writes are prevented.
-- [ ] Static assets have suitable cache policies.
-- [ ] Performance claims are based on recorded measurements.
+- [ ] Production build succeeds.
+- [ ] Largest assets are inspected.
+- [ ] Embedded prompt history is reviewed.
+- [ ] Images are appropriately sized.
+- [ ] Third-party SDKs are justified.
+- [ ] Loading and failure states are usable.
+- [ ] Generated dependencies are excluded from deployment.
+- [ ] Claims are backed by repeatable measurements.
