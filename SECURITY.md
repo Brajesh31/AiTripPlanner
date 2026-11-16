@@ -1,59 +1,65 @@
-# 🔐 Security Policy
+# Security Policy
 
-## Project security scope
+## 1. Project security scope
 
-AI Trip Planner is a browser-first React application that handles Google profile information, travel preferences, AI-generated itinerary data, and saved Firestore documents. It integrates with Google OAuth, Gemini, Places, and Firebase.
+AI Trip Planner is a browser-first React application integrating Google OAuth, Gemini, and Firebase Firestore. It handles profile information and saved travel itineraries. This document records security expectations and risks observed in the source. It is not a penetration-test report or a security certification.
 
-This policy is not a penetration-test report or security certification. It records how to report issues and the security boundaries contributors must preserve.
+## 2. Reporting vulnerabilities
 
-## Reporting a vulnerability
-
-Report suspected vulnerabilities privately to the maintainer, **Brajesh Kumar** ([ @Brajesh31 ](https://github.com/Brajesh31)), using GitHub's private vulnerability reporting facility when available. Do not publish exploit instructions, live keys, access tokens, private itineraries, or personal information in a public issue.
+Report suspected vulnerabilities privately to **Brajesh Kumar** ([GitHub @Brajesh31](https://github.com/Brajesh31)). Do not publish credentials, access tokens, private itineraries, exploit details, or personal data in a public issue.
 
 Include:
-- affected route, file, workflow, or provider integration;
-- concise issue description and realistic impact;
+- affected file, route, workflow, or provider integration;
+- issue description and realistic impact;
 - sanitized reproduction steps;
-- browser/runtime and commit details;
-- relevant sanitized logs or screenshots;
-- suggested mitigation, if known.
+- browser and environment details;
+- whether the issue requires authentication;
+- evidence with secrets and personal data removed;
+- suggested mitigation if known.
 
-## Response process
+Reports are reviewed on a best-effort basis. No formal response-time commitment is promised.
 
-The maintainer will review the report, attempt reproduction, assess impact, and determine the appropriate remediation. Response time depends on availability and severity; no formal service-level agreement is promised. Please allow a reasonable opportunity to investigate a confirmed issue before public disclosure.
+## 3. Known risks requiring attention
 
-## Known security concerns requiring attention
+### Gemini key exposure
+`src/service/AIModal.jsx` reads `VITE_GOOGLE_GEMINI_AI_API_KEY` and initializes the Gemini SDK in browser code. Vite exposes `VITE_*` values in built client assets. This key is not private. Restrict it immediately and move privileged AI generation behind a trusted server-side function. Rotate it if it has been exposed beyond its intended scope.
 
-The inspected source currently:
-- calls Gemini directly from the browser using a `VITE_*` key;
-- stores a Google profile response in local storage;
-- uses the stored email as a Firestore query condition;
-- initializes Firebase from hard-coded browser configuration;
-- parses model-generated JSON without a complete runtime schema validation layer;
-- contains no Firestore rules file in the repository tree.
+### Firebase configuration and rules
+`src/service/FirebaseConfig.jsx` contains Firebase web configuration values. These values are not an authorization boundary. Firestore Security Rules must enforce user ownership and field validation. The reviewed tree does not contain a Firestore rules file; treat secure rules as a production blocker.
 
-These are material production risks. Local storage is not an identity proof, a client-side query is not authorization, and a `VITE_*` value is not secret.
+### LocalStorage identity
+The app stores Google profile data in localStorage and uses its email as a Firestore query filter. Browser storage can be forged. It must not authorize access. Align trusted authentication with Firestore rules, preferably using Firebase Authentication UID or a trusted backend.
 
-## Contributor requirements
+### Model output
+Gemini output is parsed with JSON.parse and written to Firestore without a full schema validator. Validate structure, bounds, allowed URL protocols, and document size before persistence and rendering.
 
-- Never commit keys, tokens, passwords, private keys, or production credentials.
-- Never put privileged secrets in client-side `VITE_*` values.
-- Use Firestore rules to enforce authenticated ownership.
-- Validate model output and user input before persistence or rendering.
-- Do not log tokens, profile objects, private prompts, or full itineraries.
-- Use synthetic user data in examples and tests.
-- Restrict browser API keys by origin and allowed API.
-- Do not expose secrets to untrusted pull-request code.
-- Review third-party scripts, packages, and SVG assets before adoption.
+## 4. Contributor security requirements
 
-## Credential exposure response
+- Never commit keys, tokens, passwords, private keys, service account files, or production data.
+- Do not put privileged credentials in Vite variables or browser bundles.
+- Do not trust localStorage values for authorization.
+- Do not render AI output as trusted HTML.
+- Validate untrusted inputs and generated data.
+- Keep provider scopes and API restrictions minimal.
+- Use least-privilege GitHub Actions permissions.
+- Avoid exposing secrets to untrusted pull-request workflows.
+- Use separate development and production provider projects.
+- Keep sensitive prompts, profiles, and itineraries out of logs.
 
-If a credential is committed or exposed, removing it in a later commit is not enough. Revoke or rotate it, review provider usage and access logs, restrict the replacement credential, and assess whether user data was accessed.
+## 5. Incident response
 
-## Scope boundaries
+If a credential is exposed, revoke or rotate it immediately, inspect provider usage, and review relevant logs. Deleting the value in a later Git commit does not remove it from Git history.
 
-The application does not book accommodation, confirm availability, or process payments. The absence of those capabilities is not a vulnerability. A future implementation of those capabilities requires a separate threat model, authorization design, and provider compliance review.
+If user trip data is exposed, investigate affected documents, access paths, provider logs, and applicable notification obligations. Preserve evidence securely and avoid publishing private itinerary contents.
 
-## Related guidance
+## 6. Scope boundaries
 
-See [docs/security.md](docs/security.md), [docs/authentication.md](docs/authentication.md), [docs/database.md](docs/database.md), and [docs/privacy.md](docs/privacy.md).
+The application provides itinerary suggestions and does not itself reserve accommodation or process payments. A vulnerability involving a third-party provider should still be assessed, but the absence of booking functionality is not a vulnerability.
+
+## 7. Related documentation
+
+- [Security Practices](docs/security.md)
+- [Environment Configuration](docs/environment.md)
+- [Authentication](docs/authentication.md)
+- [Firestore Data Model](docs/firestore-data-model.md)
+- [Privacy](docs/privacy.md)
