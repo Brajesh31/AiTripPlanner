@@ -1,101 +1,62 @@
 # Environment Configuration
 
-## 1. Purpose
+## Purpose and security boundary
+Vite reads environment variables during development and build. Variables prefixed with `VITE_` are replaced into the client bundle and visible to anyone who can access the built assets. Never use a Vite-prefixed variable for a private credential.
 
-Vite reads environment variables during development and build. This project uses variables prefixed with `VITE_`. Vite replaces these references in the client bundle, which means their values are visible to anyone who can access the application assets.
+## Variables referenced by the repository
 
-**Never use a `VITE_*` variable for a private credential.** Browser-side API keys must be treated as public and protected through provider restrictions, quotas, and appropriate architecture.
-
-## 2. Variables currently referenced
-
-| Variable | Source reference | Current use | Handling |
+| Variable | Source | Use | Security treatment |
 |---|---|---|---|
-| `VITE_GOOGLE_AUTH_CLIENT_ID` | `src/main.jsx` | Google OAuth browser client ID | Public client configuration; restrict authorized origins and OAuth settings |
-| `VITE_GOOGLE_GEMINI_AI_API_KEY` | `src/service/AIModal.jsx` | Gemini SDK instantiated in the browser | Exposed client key; move privileged AI calls to a server-side boundary |
-| `VITE_GOOGLE_PLACES_API_KEY` | Present in `.env.example` and inactive helper comments | Current active use is not verified | Do not assume autocomplete is connected; restrict any browser key to required APIs and origins |
+| `VITE_GOOGLE_AUTH_CLIENT_ID` | `src/main.jsx` | Google OAuth browser client ID | Public client configuration, restrict authorized origins |
+| `VITE_GOOGLE_GEMINI_AI_API_KEY` | `src/service/AIModal.jsx` | Gemini SDK in browser | Exposed browser key, move privileged requests to server |
+| `VITE_GOOGLE_PLACES_API_KEY` | `.env.example` and inactive helper comments | Active use not verified | Do not assume autocomplete is connected; restrict if used |
 
-The actual example file contains placeholder values. Replace them locally only. Do not commit a populated `.env` file.
-
-## 3. Local file setup
+## Local configuration
+Copy the example into a local file.
 
 PowerShell:
-
 ```powershell
 Copy-Item .env.example .env
 ```
 
-macOS / Linux:
-
+macOS/Linux:
 ```bash
 cp .env.example .env
 ```
 
-After changing environment values, restart the Vite development server. Vite reads environment configuration when the process starts and during build.
+Set placeholder values only in your local `.env`. Do not commit populated environment files. Restart Vite after changing variables.
 
-## 4. Vite exposure model
+## Vite exposure model
+Every `VITE_*` value referenced by frontend code can be inspected in JavaScript assets. Do not use these variables for service-account private keys, OAuth client secrets, server tokens, database passwords, signing keys, or unrestricted API credentials. Privileged operations belong on a trusted server-side function using server-only environment variables.
 
-Vite exposes variables with the configured public prefix to browser code. A variable such as `VITE_GOOGLE_GEMINI_AI_API_KEY` is not private merely because it is stored in a local `.env` file. Once built, the value can be inspected in JavaScript assets.
+## Provider restrictions
+For browser API keys, restrict allowed origins/referrers and allowed APIs, use separate development and production keys, set quotas and budget alerts, monitor unexpected usage, and rotate a key if it has escaped its intended scope.
 
-Do not use Vite variables for:
-- service account private keys;
-- OAuth client secrets;
-- server-side access tokens;
-- database passwords;
-- unrestricted provider API keys;
-- signing keys or encryption secrets.
+OAuth client IDs are meant to be public to browser applications, but authorized origins, consent settings, scopes, and callback behavior still need configuration.
 
-For privileged operations, use a server-side function and a server-only environment variable without the public Vite prefix.
+## Firebase configuration
+Firebase web configuration in `src/service/FirebaseConfig.jsx` is hard-coded. Firebase web API keys and app identifiers are generally public configuration, not authorization controls. Safety depends on Firestore Security Rules, Firebase Authentication, API restrictions, App Check where appropriate, and project settings.
 
-## 5. Provider restrictions
+## Troubleshooting
+If OAuth or Gemini fails, verify exact variable spelling, confirm `.env` is at the repository root, restart Vite, and check the browser's Network and Console panels. Confirm the deployed host has the matching build-time values and rebuild after changes.
 
-For Google browser keys:
-- restrict allowed web origins or HTTP referrers;
-- restrict the key to the minimum required APIs;
-- use separate keys for development and production;
-- set quotas and budget alerts;
-- rotate keys if their intended scope is exceeded;
-- review usage and unexpected traffic.
+## Deployment
+Configure public Vite variables in the host's build environment. Changing a variable after static assets were built does not retroactively change the bundle. Keep development and production provider projects separate where possible.
 
-OAuth client IDs are designed to be used by browser applications, but authorized origins, consent settings, redirect behavior, and application domains must still be configured correctly.
-
-## 6. Firebase configuration
-
-The current Firebase web configuration is hard-coded in `src/service/FirebaseConfig.jsx`. Firebase web configuration values, including the web API key, are commonly public identifiers, not authorization controls. Their safety depends on Firebase Security Rules, Authentication, App Check where appropriate, API restrictions, and project configuration.
-
-Do not replace this configuration with a client-side secret. If moving values into Vite environment variables for environment separation, remember that they remain public.
-
-## 7. Missing or incorrect values
-
-Symptoms include:
-- Google sign-in does not initialize;
-- Gemini reports authentication or API errors;
-- provider requests fail due to restrictions;
-- the browser bundle receives `undefined` for a configuration value.
-
-Check exact variable spelling, ensure `.env` is in the project root, restart Vite, and verify the correct deployment environment contains the matching values.
-
-## 8. Deployment environment
-
-Configure public Vite variables in the hosting provider's build environment and trigger a fresh build after changes. Do not assume changing a runtime environment variable after the static assets have been built will change values already embedded in the bundle.
-
-Keep development and production keys and provider projects separate where practical.
-
-## 9. Example policy
-
+## Example placeholders
 ```dotenv
-VITE_GOOGLE_AUTH_CLIENT_ID=replace-with-your-browser-oauth-client-id
-VITE_GOOGLE_GEMINI_AI_API_KEY=replace-with-a-restricted-browser-key
-VITE_GOOGLE_PLACES_API_KEY=replace-with-a-restricted-browser-key
+VITE_GOOGLE_AUTH_CLIENT_ID=replace-with-browser-oauth-client-id
+VITE_GOOGLE_GEMINI_AI_API_KEY=replace-with-restricted-key
+VITE_GOOGLE_PLACES_API_KEY=replace-with-restricted-key
 ```
 
-This is a placeholder format, not a recommendation to expose privileged Gemini credentials from the browser. The Gemini integration should be moved server-side for a production deployment.
+This is a format example only. The current browser-based Gemini key is exposed; move privileged generation server-side before production.
 
-## 10. Review checklist
-
+## Checklist
 - [ ] `.env` is ignored by Git.
 - [ ] Only placeholders are committed in `.env.example`.
-- [ ] No private service credential uses a `VITE_` prefix.
-- [ ] Browser API keys are restricted by origin and API.
-- [ ] Development and production environments are separated.
-- [ ] Provider quotas and budget alerts are reviewed.
-- [ ] A production build is regenerated after environment changes.
+- [ ] No private credential uses a `VITE_` prefix.
+- [ ] Browser keys are restricted by origin and API.
+- [ ] Development and production configurations are separated.
+- [ ] Quotas and budget alerts are reviewed.
+- [ ] Production assets are rebuilt after configuration changes.
