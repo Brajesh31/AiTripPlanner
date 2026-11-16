@@ -1,27 +1,34 @@
-# 🤝 Contributing Guide
+# Contributing Guide
 
-Thank you for considering a contribution to AI Trip Planner. The repository is a React/Vite travel-planning application that connects Google OAuth, Gemini, Google Places autocomplete, and Firebase Firestore. Contributions should make the application more correct, secure, accessible, reliable, and maintainable.
+Thank you for considering a contribution to AI Trip Planner. This repository is a React/Vite learning project that generates travel itinerary suggestions using Google and Firebase services. Contributions should improve correctness, usability, accessibility, reliability, security, or maintainability.
 
-## 1. Project scope
+## 1. Understand the project first
 
-Current code includes:
-- React route screens for landing, trip creation, saved trips, and trip detail;
-- Google OAuth browser integration;
-- Gemini-assisted generation of itinerary suggestions;
-- Firestore persistence in the `AITrips` collection;
-- Google Places autocomplete integration;
-- Tailwind styling and Radix UI components.
+Read the [documentation index](docs/README.md), especially:
+- [Architecture](docs/architecture.md)
+- [Development](docs/development.md)
+- [Environment Configuration](docs/environment.md)
+- [AI Output Contract](docs/ai-output-contract.md)
+- [Authentication](docs/authentication.md)
+- [Firestore Data Model](docs/firestore-data-model.md)
+- [Security](docs/security.md)
+- [Testing](docs/testing.md)
 
-The application does not provide hotel reservation, confirmed availability, ticket sales, or payment processing. AI-generated prices, ratings, images, coordinates, and travel guidance are not verified facts.
+The current app uses React 18, Vite 5, React Router, Tailwind CSS, Google OAuth, Gemini SDK, Firebase Firestore, and Axios. It does not contain a first-party backend API or a dedicated automated browser test suite.
 
-## 2. Before starting
+## 2. Good contribution areas
 
-1. Read the [documentation index](docs/README.md).
-2. Search existing issues and discussions.
-3. Identify the user problem and affected route.
-4. Check whether the change affects provider configuration or persisted Firestore fields.
-5. Confirm that any media or external service is permitted for the intended use.
-6. Keep the change focused.
+- form validation and input normalization;
+- safe model output parsing and schema validation;
+- user-friendly loading and error states;
+- Firestore data ownership and rules;
+- coherent authentication and session handling;
+- responsive and accessible UI improvements;
+- provider quota, failure, and timeout handling;
+- dependency maintenance and build reliability;
+- documentation and workflow maintenance.
+
+Avoid adding dependencies or infrastructure without describing the problem they solve and the maintenance cost they introduce.
 
 ## 3. Local setup
 
@@ -29,82 +36,76 @@ The application does not provide hotel reservation, confirmed availability, tick
 git clone https://github.com/Brajesh31/AiTripPlanner.git
 cd AiTripPlanner
 npm ci
-cp .env.example .env
+```
+
+Create a local `.env` from `.env.example` and configure development provider values. See [Environment Configuration](docs/environment.md). Do not use production user data or unrestricted API keys for local testing.
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-On Windows PowerShell, copy the example using `Copy-Item .env.example .env`. Configure development provider values locally. Do not commit populated environment files.
+## 4. Development standards
 
-## 4. Code standards
-
-- Follow the existing React and JSX conventions.
-- Keep route-level functionality in its feature folder.
-- Keep shared UI primitives reusable.
-- Keep provider integration in service modules.
-- Preserve Vite's `@` import alias.
+- Keep React components focused and readable.
+- Keep provider and persistence logic in appropriate service boundaries.
+- Avoid putting privileged keys in browser code.
+- Validate user input before provider calls.
+- Treat model output as untrusted data.
 - Use stable React keys.
-- Handle async work with explicit loading, success, and failure states.
-- Validate route parameters and external data.
-- Avoid disabling lint rules broadly.
-- Do not log access tokens, user profiles, or full itineraries.
-- Do not use local-storage email as authorization.
-- Treat Gemini output as untrusted until schema-validated.
+- Handle promise failures, loading states, and empty results.
+- Avoid broad ESLint suppressions unless justified with a comment.
+- Keep user profile and trip data out of console logs.
+- Ensure Firestore ownership is enforced by rules, not client-side filters.
 
-## 5. Dependencies
+## 5. Provider and data changes
 
-Use npm and update `package-lock.json` with package changes. Do not add Bun or Yarn lockfiles. Avoid adding a dependency for a behavior that can be handled clearly with existing utilities or browser APIs. Review dependency license, maintenance, security advisories, size, and compatibility before adoption.
+Changes to Gemini prompts or response fields must update the [AI Output Contract](docs/ai-output-contract.md), response validation, detail renderers, and compatibility expectations for already saved trips.
 
-Do not commit `node_modules/`, Vite cache, `dist/`, or other generated files.
+Changes to sign-in must update the [Authentication](docs/authentication.md) and [Privacy](docs/privacy.md) guides. Changes to Firestore must include access-rule review, ownership tests, and data lifecycle documentation.
 
-## 6. Provider and data changes
+Never commit OAuth tokens, Gemini keys, Firebase service account credentials, production database exports, or real itineraries.
 
-Any change to OAuth, Gemini, Places, Firebase, or Firestore must document:
-- required environment values and whether they are browser-visible;
-- provider permissions and API restrictions;
-- request/response shape;
-- quota, timeout, retry, and error behavior;
-- privacy and retention implications;
-- authorization enforcement;
-- test coverage.
+## 6. UI and accessibility expectations
 
-A change to persisted Firestore fields requires compatibility consideration for existing records. Update [Data Model](docs/data-model.md) and [Database](docs/database.md).
+For UI changes, test narrow and wide viewports, keyboard focus, labels, dialog behavior, selected states, error announcements, and reduced-motion settings. Generated itinerary cards must remain understandable when content is long, incomplete, or malformed.
 
-## 7. Validation
+## 7. Validation requirements
 
-Before submitting:
+Run:
 
 ```bash
 npm ci
 npm run lint
 npm run build
-git diff --check
+npm run preview
 ```
 
-Also test changed routes in a browser. For provider flows, test success and failure states. For UI changes, test responsive layouts and keyboard access. For Firestore changes, verify both authorized and unauthorized access using a dedicated test project.
+Then test affected routes and failure scenarios. The repository does not currently contain a dedicated automated test suite. Do not claim unit or browser tests passed unless such tests have actually been added and run.
 
-The repository currently has no dedicated end-to-end or Firestore rules test suite. Do not claim such tests passed unless they have actually been added and run.
+## 8. Pull request requirements
 
-## 8. Pull request description
+A useful pull request describes:
+- problem and user impact;
+- technical approach;
+- affected routes and services;
+- environment or provider changes;
+- data model or schema impact;
+- security and privacy implications;
+- validation commands and results;
+- screenshots for meaningful UI changes;
+- remaining limitations.
 
-Explain:
-- problem and motivation;
-- implementation approach;
-- routes and files affected;
-- UI or data behavior change;
-- environment/provider changes;
-- tests and environments used;
-- known limitations;
-- security/privacy considerations.
-
-Include screenshots for visible UI changes when useful, but do not include personal profiles, access tokens, private itineraries, or other sensitive data.
+Use the pull request template in `.github/PULL_REQUEST_TEMPLATE.md`.
 
 ## 9. Commit hygiene
 
-Keep commits focused and descriptive. Do not commit `.env`, `node_modules/`, build output, IDE caches, private logs, credentials, or customer data. Inspect `git status` and the complete diff before committing.
+Keep commits focused. Do not commit `.env`, `node_modules/`, `dist/`, editor caches, operating-system files, logs, credentials, or private user data. Keep `package-lock.json` synchronized with `package.json`.
 
-## 10. Review principles
+## 10. Asset licensing
 
-Changes are reviewed for correctness, security, accessibility, data ownership, maintainability, licensing, and consistency with documented behavior. A change may require revision if it introduces unvalidated model output, weakens Firestore rules, exposes keys, or claims that an unimplemented feature exists.
+Use original or appropriately licensed assets. Verify source, license, attribution, and commercial-use terms. Do not assume that an image found online can be redistributed.
 
 ## 11. Maintainer
 
