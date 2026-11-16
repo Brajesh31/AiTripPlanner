@@ -81,3 +81,18 @@ Do not document planned behavior as implemented. A feature is current only when 
 - Describe browser-visible Vite variables as public configuration, never as secrets.
 - Record unresolved risks instead of implying that a policy file fixes them.
 - Update related documentation in the same change when routes, data, environment variables, or deployment behavior change.
+
+## Additional engineering guides
+
+| Guide | Purpose |
+|---|---|
+| [Environment Configuration](environment.md) | Public Vite variables and provider key restrictions |
+| [AI Output Contract](ai-output-contract.md) | Prompt inputs, expected JSON, and validation risks |
+| [Authentication](authentication.md) | Google OAuth flow, local profile cache, and trusted identity |
+| [Firestore Data Model](firestore-data-model.md) | AITrips record shape, access ownership, and rules requirements |
+| [Privacy](privacy.md) | Profile and itinerary data handling |
+| [Accessibility](accessibility.md) | Forms, dialogs, async content, and keyboard behavior |
+| [Performance](performance.md) | Bundle size, SDKs, images, and provider latency |
+| [Deployment Operations](deployment-operations.md) | Host settings, SPA rewrites, release checks, and rollback |
+| [Testing](testing.md) | Route smoke tests, provider tests, and regression strategy |
+| [Maintenance](maintenance.md) | Dependencies, provider config, and repository hygiene |
