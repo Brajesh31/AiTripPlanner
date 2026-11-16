@@ -22,7 +22,7 @@
 
 ## 🗺️ Overview
 
-AI Trip Planner turns a small set of trip preferences into a proposed itinerary. The current application collects a destination, trip duration, budget category, and traveler category. It uses a Google OAuth browser flow, sends a prompt to the Gemini SDK, parses the response as JSON, and stores the generated trip in Cloud Firestore.
+AI Trip Planner turns trip preferences into a proposed itinerary. The current app collects a destination, trip duration, budget category, and traveler category. It uses a Google OAuth browser flow, sends a prompt to the Gemini SDK, parses the response as JSON, and stores the generated trip in Cloud Firestore.
 
 This is a **planning and suggestion interface**, not a booking or travel-verification service.
 
@@ -37,7 +37,7 @@ This is a **planning and suggestion interface**, not a booking or travel-verific
 | Google sign-in | Browser OAuth flow using `@react-oauth/google` |
 | AI generation | Gemini SDK prompt request from browser code |
 | Trip persistence | Firestore documents in the `AITrips` collection |
-| Saved trips | Query by the profile email currently cached in localStorage |
+| Saved trips | Query by profile email currently cached in localStorage |
 | Trip details | Load one trip document by route ID |
 | Itinerary display | Hotel suggestions and day-wise place cards |
 | Hosting support | Vite build and Vercel SPA rewrite configuration |
@@ -76,7 +76,7 @@ flowchart LR
     JSON --> UI
 ```
 
-The browser calls Gemini and Firestore directly. This is an important security constraint, not a recommended final architecture. Review [Security](docs/security.md) before using real user data.
+The browser calls Gemini and Firestore directly. This is a security constraint, not a recommended final architecture. Review [Security](docs/security.md) before using real user data.
 
 ## 🧰 Technology stack
 
@@ -171,21 +171,18 @@ CI runs dependency installation, linting, and a production build. A dedicated un
 | `/view-trip/:tripId` | Load and render a saved trip |
 | `/my-trips` | List trip records matching the cached profile email |
 
-The app uses React Router. Vercel's rewrite supports client-side routes on refresh; other static hosts need equivalent SPA fallback behavior.
+Vercel's rewrite supports client-side routes on refresh. Other static hosts need equivalent SPA fallback behavior.
 
 ## 🗂️ Repository map
 
 ```text
 AiTripPlanner/
-├── .github/
-│   ├── ISSUE_TEMPLATE/          # Bug, feature, documentation templates
-│   └── workflows/               # CI and README maintenance
+├── .github/                     # Issue templates and Actions workflows
 ├── docs/                        # Engineering and operations handbook
 ├── public/                      # Logo and static assets
 ├── src/
-│   ├── components/
-│   │   ├── custom/              # Header and hero
-│   │   └── ui/                  # Reusable UI primitives
+│   ├── components/custom/       # Header and hero
+│   ├── components/ui/           # Reusable UI primitives
 │   ├── constants/               # Prompt and preference options
 │   ├── create-trip/             # Preference and generation flow
 │   ├── my-trips/                # Saved trip listing
@@ -201,7 +198,7 @@ AiTripPlanner/
 
 ## 🔐 Security and privacy: read before deployment
 
-The current application is a browser-centric prototype. Material limitations observed in the source:
+The current application is a browser-centric prototype. Material limitations observed in source:
 
 1. **Browser-exposed Gemini key:** the client reads a `VITE_*` Gemini key. Visitors can inspect browser bundles and network traffic. Move generation to a server-side endpoint and rotate credentials that have been exposed.
 2. **Client-side profile cache:** a Google profile is stored in localStorage. Users can modify this value, so it is not proof of identity.
