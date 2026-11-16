@@ -1,3 +1,0 @@
-/// <reference types="google.maps" />
-declare const geocodeByAddress: (address: string) => Promise<google.maps.GeocoderResult[]>;
-export default geocodeByAddress;

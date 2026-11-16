@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: 📚 Project documentation
-    url: https://github.com/Brajesh31/AiTripPlanner/tree/main/docs
-    about: Review setup, AI generation, authentication, Firestore, security, and troubleshooting.
-  - name: 🔐 Security reporting
-    url: https://github.com/Brajesh31/AiTripPlanner/blob/main/SECURITY.md
-    about: Report security issues privately. Never publish tokens or private itineraries.
