@@ -1,54 +1,56 @@
 # Accessibility Guide
 
 ## Objective
-The interface should be usable by people navigating with keyboards, screen readers, zoom, and different viewport sizes. This guide defines review practices; it does not claim that the application passed a formal accessibility audit or conforms to a particular standard.
-
-## Areas to review
-Review the global header, navigation actions, Google sign-in dialog, trip form, budget/traveler selection cards, Places autocomplete suggestions, loading and error notifications, saved trip cards, and hotel/place details.
+AI Trip Planner includes navigation, a trip form, custom choice cards, a sign-in dialog, a profile popover, asynchronous generation, saved trip cards, and nested itinerary content. Accessibility must cover the whole interaction flow. This guide is a development standard, not an audit or certification.
 
 ## Semantic structure
-Use a clear primary heading per screen. Associate labels with each form field. Group related choices semantically. Use buttons for actions and links for navigation. Heading order should reflect content hierarchy, not desired font size.
+Use meaningful landmarks and heading hierarchy. Each route should have a clear page title and main content. Every form field needs a visible label. Use anchors for navigation and buttons for actions. Avoid clickable generic containers unless keyboard and accessible state semantics are fully implemented.
 
-## Keyboard operation
-- Tab and Shift+Tab must follow a logical order.
-- Enter and Space must activate appropriate controls.
-- Dialogs must manage focus when opened and restore it when closed.
-- Popovers must be operable and dismissible with Escape where appropriate.
-- Autocomplete suggestions must support keyboard selection and communicate the active option.
-- No keyboard trap may exist.
+## Trip form
+- Associate a label with destination.
+- Label the day-count input and constrain it to an appropriate positive integer.
+- Expose budget choices as a semantic selectable group.
+- Expose traveler choices with clear names and selected states.
+- Announce validation errors and associate them with fields.
+- Communicate generation/loading state.
+- Prevent accidental repeated submission.
+- Announce success and failure without relying only on color.
 
-## Forms and validation
-Every field needs an accessible label, not only placeholder text. Required status and validation errors must be programmatically associated with inputs. Error messages should explain how to correct a value. Do not communicate errors only through color or a short-lived toast.
+The current form uses custom clickable option cards. Review their roles, focusability, keyboard support, and accessible names before claiming full keyboard accessibility.
 
-The trip form should expose clear constraints for destination and duration. Prevent invalid numeric values and help users identify the field needing correction.
+## Authentication dialog
+Radix Dialog can provide focus management and dialog semantics when used correctly. Give the dialog a meaningful title and description. Confirm that opening moves focus into the dialog, closing returns focus to its trigger, Escape behavior works, and the sign-in button has a clear name. The current header has an empty dialog title that should be addressed in a future UI correction.
 
-## Dialogs, popovers, and notifications
-Radix components provide useful behavior, but composition still matters. Verify dialog titles/descriptions, close-button labels, focus behavior, popover trigger semantics, and toast announcements. A toast should not be the only way to communicate a critical error.
+## Header and profile popover
+The profile trigger needs an accessible name. Provide meaningful alt text for user imagery or an empty alt when decorative. Logout should be a real button, not a clickable heading. Ensure navigation remains clear when signed out.
 
-## Dynamic AI and data states
-Announce meaningful loading and completion states. Ensure focus does not jump unexpectedly when generated content appears. Use headings for day sections and descriptive names for hotels and places. Handle missing values without rendering blank headings.
+## Async content
+Trip generation and Firestore fetches take time. Expose busy states with suitable status semantics. Provide useful loading, empty, success, and failure messages. Unlabeled visual skeletons should not be the only information exposed to assistive technology.
 
-## Images
-Informative images need concise alternative text. Decorative images should use empty alt text. Avoid generic text such as "image". Validate externally generated image URLs and provide useful fallbacks.
+## Generated itinerary
+Use headings for days and semantic lists for places where appropriate. Label price, travel time, and other fields consistently. Do not rely on emoji alone to communicate meaning. External links should make their destination clear.
 
-## Contrast and responsive design
-Check text, buttons, input borders, focus indicators, and disabled states against actual backgrounds. Test narrow phone widths and 200% zoom. Avoid fixed heights that clip content and ensure long destination names wrap.
+## Keyboard and focus
+Test Tab/Shift+Tab order, Enter/Space activation, Escape for dialogs/popovers, and visible focus. Avoid focus traps outside modal dialogs. Do not remove outlines or ring styles without an equivalent replacement.
 
-## Motion
-Respect `prefers-reduced-motion`. Do not rely on animation alone to communicate status or progress.
+## Color, contrast, and motion
+Check actual text/control contrast. Do not use color alone for errors or selected budget/traveler choices. Respect reduced-motion preferences and avoid unnecessary animation during generation or navigation.
 
-## Manual review checklist
-- [ ] All fields have associated labels.
-- [ ] Required and invalid states are programmatically conveyed.
-- [ ] Controls are keyboard accessible.
-- [ ] Dialog focus is managed and restored.
-- [ ] Popovers and autocomplete are keyboard usable.
-- [ ] Toasts do not replace persistent critical errors.
-- [ ] Headings and landmarks communicate structure.
-- [ ] Images have suitable alternative text.
-- [ ] Contrast is checked for text, borders, and focus.
-- [ ] Content reflows at 200% zoom and narrow widths.
-- [ ] Reduced-motion preferences are respected.
-- [ ] Generated itinerary sections are structured sensibly.
+## Responsive and zoom
+Test phone, tablet, desktop, and 200% zoom. Long destination names and generated itinerary text must wrap without overlapping controls or requiring unintended horizontal scrolling.
 
-For a significant review, record route, browser, assistive technology, viewport, test date, issue severity, and remediation. Do not claim conformance based solely on automated scans.
+## Screen-reader review
+For significant changes, inspect the app with a screen reader. Confirm route headings, labels, choice state, dialog title, profile control, loading announcements, and trip-detail hierarchy are understandable.
+
+## Checklist
+- [ ] Every form input has an associated label.
+- [ ] Custom choices are keyboard-operable and expose selected state.
+- [ ] Validation errors are associated with controls.
+- [ ] Dialogs have meaningful accessible names and descriptions.
+- [ ] Popover triggers have accessible names.
+- [ ] Loading, empty, and error states are announced.
+- [ ] Focus is visible and ordered logically.
+- [ ] Text and controls have sufficient contrast.
+- [ ] Layout works at narrow widths and 200% zoom.
+- [ ] Reduced motion is respected.
+- [ ] Generated itinerary uses semantic structure.
