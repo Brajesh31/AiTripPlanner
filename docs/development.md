@@ -1,67 +1,81 @@
 # Development Guide
 
 ## Development model
-The project uses React 18, JSX, Vite, Tailwind CSS, and npm. Vite compiles the source for development and production. The current repository has no separate backend service.
+
+AI Trip Planner is a React 18 JSX application built with Vite 5 and npm. Vite serves the application during development and creates the production assets. There is no first-party backend service in the repository.
 
 ## Source map
-| Path | Purpose |
-|---|---|
-| `src/main.jsx` | React entry, providers, routes |
-| `src/App.jsx` | Landing view |
-| `src/components/custom/` | Header and hero |
-| `src/components/ui/` | Radix-backed UI primitives |
-| `src/create-trip/` | Trip preference form and generation |
-| `src/my-trips/` | Saved trip list and cards |
-| `src/view-trip/[tripId]/` | Trip detail screen |
-| `src/service/` | Gemini, Firebase, and provider modules |
-| `src/constants/` | Prompt and option definitions |
-| `src/lib/` | Shared helpers |
-| `public/` | Public static images |
-| `vite.config.js` | Vite plugin and `@` alias |
-| `tailwind.config.js` | Tailwind theme and content scanning |
 
-## Commands
+| Path | Responsibility |
+|---|---|
+| `src/main.jsx` | React entry, providers, routes, and toaster |
+| `src/App.jsx` | Landing page component |
+| `src/components/custom/` | Header and hero components |
+| `src/components/ui/` | Button, dialog, input, popover, toast primitives |
+| `src/constants/Options.jsx` | Traveler options, budget options, and AI prompt |
+| `src/create-trip/index.jsx` | Form state, OAuth, Gemini request, Firestore save |
+| `src/my-trips/index.jsx` | Saved-trip query and listing |
+| `src/my-trips/components/` | Saved-trip card |
+| `src/view-trip/[tripId]/Index.jsx` | Detail document fetch and page composition |
+| `src/view-trip/[tripId]/components/` | Hotel, itinerary, info, place, footer components |
+| `src/service/AIModal.jsx` | Gemini client and chat session |
+| `src/service/FirebaseConfig.jsx` | Firebase initialization and Firestore export |
+| `src/service/GlobalApi.jsx` | Currently commented Places API helper |
+| `src/index.css` | Tailwind directives and global tokens |
+| `src/App.css` | Landing component styles |
+| `src/lib/utils.js` | Utility class merger |
+
+## Scripts
+
+- `npm run dev`: development server.
+- `npm run build`: production build into `dist/`.
+- `npm run preview`: serve the production build locally.
+- `npm run lint`: run ESLint with the current package script.
+
+## Recommended workflow
+
+1. Pull the latest main branch.
+2. Read relevant architecture and service documentation.
+3. Inspect existing state and provider code before editing.
+4. Make one focused change.
+5. Run lint and build.
+6. Preview the production build.
+7. Test the affected routes and provider failures.
+8. Check keyboard, responsive layout, and screen-reader behavior for UI changes.
+9. Update docs and changelog when behavior or configuration changes.
+10. Review the diff and ensure no secrets or generated files are included.
+
+## Component conventions
+
+Keep components focused on one view or reusable concern. Put provider operations in service modules rather than duplicating SDK setup throughout components. Keep prompt constants and recognized option values centralized. Use stable keys for mapped JSX. Prefer state values with consistent naming and types.
+
+Do not disable React hook or accessibility lint rules broadly to suppress warnings. Fix dependencies and state ownership where possible, documenting narrowly scoped exceptions if unavoidable.
+
+## Async operations
+
+Provider and Firestore requests can fail. Each operation should have explicit pending, success, empty, and failure states. Avoid unhandled promise rejections. Prevent duplicate generation requests and stale state updates after route changes. Do not log tokens, full user profiles, or complete private itineraries.
+
+## Form validation
+
+Validate destination length, supported duration range, integer day counts, budget choices, and traveler categories before calling Gemini. Use one canonical field name for day count throughout input state, prompt interpolation, Firestore persistence, and rendering. Do not trust values merely because the UI normally supplies them.
+
+## Gemini output handling
+
+Model response text is untrusted. Parse it in one service boundary, validate required fields and data size, reject malformed content, and only then persist. Do not render generated content as raw HTML or trust model-supplied links and facts.
+
+## Firestore access
+
+Client-side filtering by email is not authorization. Firestore Security Rules must use a trusted identity and prevent cross-user reads and writes. Review authentication and data model docs together before changing persistence.
+
+## Local validation
+
 ```bash
 npm ci
-npm run dev
 npm run lint
 npm run build
 npm run preview
 ```
 
-Use npm only. The committed lockfile is the reproducible dependency source.
+## Documentation obligations
 
-## Import alias
-Imports beginning with `@/` resolve to `src/`. The alias is configured in `vite.config.js` and `jsconfig.json`. Keep both definitions aligned.
-
-## React conventions
-- Use function components and hooks consistently.
-- Give mapped elements stable keys.
-- Keep component responsibilities focused.
-- Avoid disabling lint rules globally to hide warnings.
-- Handle asynchronous calls with explicit loading, success, and failure states.
-- Validate route parameters before querying Firestore.
-- Do not trust local storage or client-supplied email for authorization.
-- Never log tokens, user profiles, or full travel plans unnecessarily.
-
-## UI component conventions
-Shared UI components live in `src/components/ui/` and use Radix primitives with Tailwind styling. Reuse them rather than copying modal, popover, button, or toast behavior. Review keyboard access, focus trapping/restoration, Escape behavior, labels, and screen-reader output.
-
-## Provider integration
-Keep provider calls within service modules where practical. The current code directly calls Gemini and Firestore from the browser. A server-side proxy requires corresponding changes to environment, API, architecture, security, and deployment documentation. Never expose privileged secrets in `VITE_*` variables.
-
-## AI data handling
-Treat Gemini output as untrusted text. Parse safely, validate against an explicit schema, enforce required fields and sensible bounds, and handle partial or malformed results. Do not render generated HTML directly. Verify travel information independently.
-
-## Firestore access
-Firestore Security Rules must enforce authenticated ownership. A query filtered by local-storage email is not a security control. Test allowed access to a user's own record and denied cross-user access.
-
-## Before committing
-```bash
-npm run lint
-npm run build
-git diff --check
-git status --short
-```
-
-Also test changed routes, provider failure states, responsive layouts, and keyboard navigation. Update relevant documentation when routes, providers, environment values, Firestore fields, authentication, or deployment behavior change.
+Changes to routes require updates to architecture and deployment. Changes to public variables require updates to environment docs and .env.example. Changes to prompt fields require updates to AI output, database, and renderers. Changes to auth or ownership require updates to authentication, Firestore, privacy, and security docs.
