@@ -28,6 +28,17 @@ Welcome to the technical and operational handbook for **AI Trip Planner**. This 
 | [🧹 Maintenance](maintenance.md) | Dependency, provider, workflow, and repository upkeep |
 | [❓ FAQ](faq.md) | Common project questions |
 
+## 📚 Extended documentation
+
+| Guide | Purpose |
+|---|---|
+| [Technology Decisions](technology-decisions.md) | Stack rationale, constraints, and decision records |
+| [Architecture Diagrams](diagrams.md) | User flow, data lifecycle, service boundaries, CI |
+| [Glossary](glossary.md) | Shared technical vocabulary |
+| [Release Checklist](release-checklist.md) | Pre-release quality and security gates |
+| [Observability](observability.md) | Debugging, diagnostics, and telemetry recommendations |
+| [Accessibility QA](accessibility-qa.md) | Manual keyboard, screen-reader, and responsive checks |
+
 ## 🧾 Current implementation snapshot
 
 | Area | Current state |
