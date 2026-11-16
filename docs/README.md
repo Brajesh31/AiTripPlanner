@@ -1,98 +1,76 @@
 # AI Trip Planner Documentation
 
-This directory contains the technical, operational, security, and maintenance documentation for **AI Trip Planner**. The guides describe the repository's current implementation and identify limitations that matter when developing or deploying it.
+This directory is the technical and operational reference for **AI Trip Planner**, a React/Vite application that generates itinerary suggestions using Gemini and stores trip documents in Firebase Cloud Firestore.
 
-> **Important:** This is an AI-assisted itinerary planning application, not a travel booking platform. Generated hotel and destination suggestions can be incomplete, outdated, or inaccurate. The application does not make reservations or guarantee prices, hours, availability, transport times, safety, or accessibility.
+> **Important:** The application is not a booking platform. AI-generated hotel and destination details may be inaccurate or outdated. Prices, opening hours, availability, travel times, ratings, images, ticket costs, safety, and accessibility must be verified with official providers.
 
-## Documentation map
-
-| Guide | Contents |
-|---|---|
-| [Installation](installation.md) | Requirements, npm installation, environment configuration, and local startup |
-| [Development](development.md) | Source layout, code conventions, scripts, and workflow |
-| [Architecture](architecture.md) | React entry point, routes, providers, UI layers, and service boundaries |
-| [API and Services](api.md) | Gemini, Google OAuth, Google User Info, Places, and Firestore usage |
-| [Database](database.md) | Firestore collection, document fields, query patterns, and data lifecycle |
-| [Deployment](deployment.md) | Vite production build, Vercel SPA routing, environment setup, and release checks |
-| [Security](security.md) | Browser key exposure, OAuth, Firebase rules, data ownership, and incident response |
-| [Troubleshooting](troubleshooting.md) | Install, build, authentication, AI, Firestore, routing, and deployment issues |
-| [Testing](testing.md) | Lint/build verification and a route/provider manual test plan |
-| [Environment Configuration](environment.md) | Exact public Vite variables and provider restrictions |
-| [AI Output Contract](ai-output-contract.md) | Prompt shape, expected JSON fields, parsing risks, and validation requirements |
-| [Authentication and Identity](authentication.md) | Google OAuth browser flow and local profile cache |
-| [Firestore Data Model](firestore-data-model.md) | AITrips records, ownership expectations, and security rules |
-| [Privacy and Data Lifecycle](privacy.md) | Profile and itinerary data, retention, deletion, and provider sharing |
-| [Deployment Operations](deployment-operations.md) | Environment parity, Vercel settings, route rewrites, rollback, and release verification |
-| [Accessibility](accessibility.md) | Semantic markup, keyboard interactions, forms, dialogs, and screen readers |
-| [Performance](performance.md) | Vite bundles, images, external requests, and runtime performance |
-| [Contribution Guide](../CONTRIBUTING.md) | How to propose and validate changes |
-| [Support](../SUPPORT.md) | What information to include when asking for help |
-| [Roadmap](../ROADMAP.md) | Known engineering priorities and future work |
-
-## Current application summary
-
-AI Trip Planner is a React 18 single-page application using Vite. React Router handles the routes. The visible application flow includes:
-1. a landing page and navigation;
-2. a trip creation form for destination, duration, budget, and traveler group;
-3. Google sign-in through the Google OAuth React package;
-4. a Gemini model request using a prompt template;
-5. saving the parsed itinerary and user selection into a Firestore `AITrips` collection;
-6. listing the signed-in user's saved trip documents;
-7. rendering a trip detail page from a Firestore document.
-
-The app uses Tailwind CSS, Radix UI primitives, Lucide and React icon packages, Axios, Firebase, Google Places autocomplete, and the Google Generative AI SDK.
-
-## Current technical boundaries
-
-| Area | Current implementation |
-|---|---|
-| UI framework | React 18 with JSX |
-| Dev/build tool | Vite 5 |
-| Routing | React Router DOM 6 |
-| Styling | Tailwind CSS 3 and project CSS |
-| Authentication | Browser-based Google OAuth |
-| Profile cache | Browser localStorage |
-| AI generation | Gemini SDK called from browser code |
-| Persistence | Cloud Firestore |
-| Places | Google Places autocomplete package is imported in the trip form; a separate Places API helper is currently commented out |
-| Backend API | No first-party backend service in this repository |
-| Hosting configuration | Vercel rewrite to `index.html` |
-| Tests | No dedicated unit or browser test suite currently present |
-
-## Important security and reliability notes
-
-The source contains Firebase web configuration values in `src/service/FirebaseConfig.jsx`. Firebase web configuration is normally public client configuration, but its safety depends on correct Firebase Security Rules, API restrictions, and project configuration. It must not be treated as authorization.
-
-The Gemini API key is read from `VITE_GOOGLE_GEMINI_AI_API_KEY` and used in browser code. Any Vite environment variable beginning with `VITE_` is bundled into client-side output and can be inspected by visitors. A privileged generative-AI key should be moved behind a trusted server or serverless function before production use. Rotate any credential that has been exposed beyond its intended scope.
-
-The application stores a Google profile object in localStorage and associates saved trips using the email field. Client-side checks are not access control. Firestore Security Rules must enforce authenticated ownership. Review [Security](security.md), [Privacy](privacy.md), and [Firestore Data Model](firestore-data-model.md) before deployment.
-
-## How to read the docs
-
-Use the installation guide to start locally. Read architecture and service docs before changing cross-cutting behavior. For changes involving user identity or stored trips, review authentication, Firestore, privacy, and security together. For prompt or response changes, update the AI output contract and corresponding UI renderers.
-
-Do not document planned behavior as implemented. A feature is current only when the source code implements it and its behavior has been verified.
-
-## Documentation maintenance standards
-
-- Keep paths, scripts, variable names, route names, and collection names aligned with source.
-- State whether a provider integration is active, experimental, or commented out.
-- Never include real API keys, OAuth tokens, user emails, or itinerary contents in examples.
-- Describe browser-visible Vite variables as public configuration, never as secrets.
-- Record unresolved risks instead of implying that a policy file fixes them.
-- Update related documentation in the same change when routes, data, environment variables, or deployment behavior change.
-
-## Additional engineering guides
+## Guide index
 
 | Guide | Purpose |
 |---|---|
-| [Environment Configuration](environment.md) | Public Vite variables and provider key restrictions |
-| [AI Output Contract](ai-output-contract.md) | Prompt inputs, expected JSON, and validation risks |
-| [Authentication](authentication.md) | Google OAuth flow, local profile cache, and trusted identity |
-| [Firestore Data Model](firestore-data-model.md) | AITrips record shape, access ownership, and rules requirements |
-| [Privacy](privacy.md) | Profile and itinerary data handling |
-| [Accessibility](accessibility.md) | Forms, dialogs, async content, and keyboard behavior |
-| [Performance](performance.md) | Bundle size, SDKs, images, and provider latency |
-| [Deployment Operations](deployment-operations.md) | Host settings, SPA rewrites, release checks, and rollback |
-| [Testing](testing.md) | Route smoke tests, provider tests, and regression strategy |
-| [Maintenance](maintenance.md) | Dependencies, provider config, and repository hygiene |
+| [Installation](installation.md) | Prerequisites, npm installation, local configuration, and startup |
+| [Development](development.md) | Source tree, scripts, conventions, and local workflow |
+| [Architecture](architecture.md) | React entry point, providers, routes, components, and service boundaries |
+| [API and Services](api.md) | Gemini, Google OAuth, User Info, Places, and Firestore integrations |
+| [Database](database.md) | Current Firestore collection, fields, read/write behavior, and lifecycle |
+| [Deployment](deployment.md) | Vite build, output directory, SPA route fallback, and hosting |
+| [Security](security.md) | Exposed browser key, identity, Firestore rules, and incident handling |
+| [Troubleshooting](troubleshooting.md) | Install, build, environment, OAuth, Gemini, Firestore, routing, and deployment |
+| [Environment](environment.md) | Exact Vite variables and provider restrictions |
+| [AI Output Contract](ai-output-contract.md) | Prompt input, expected JSON structure, and validation requirements |
+| [Authentication](authentication.md) | Google OAuth, local profile cache, and trusted identity boundaries |
+| [Firestore Data Model](firestore-data-model.md) | AITrips document shape and owner access expectations |
+| [Privacy](privacy.md) | Profile and itinerary handling, retention, and deletion |
+| [Accessibility](accessibility.md) | Forms, dialogs, keyboard, focus, and generated content |
+| [Performance](performance.md) | Bundle cost, provider latency, images, and dependency hygiene |
+| [Deployment Operations](deployment-operations.md) | Host settings, provider setup, route verification, rollback |
+| [Testing](testing.md) | Lint/build baseline and manual integration test plan |
+| [Maintenance](maintenance.md) | Dependency, provider, workflow, and repository maintenance |
+| [FAQ](faq.md) | Frequently asked project questions |
+
+## Current implementation snapshot
+
+| Area | Status |
+|---|---|
+| UI | React 18 with JSX |
+| Build | Vite 5 |
+| Routing | React Router DOM 6 |
+| Styling | Tailwind CSS 3 and project CSS |
+| Authentication | Browser-based Google OAuth library |
+| Profile storage | localStorage key `user` |
+| AI | Gemini SDK called in browser |
+| Persistence | Firebase Cloud Firestore |
+| Places | Package imported, but current destination input is a text input |
+| First-party API | Not present |
+| Automated tests | No unit, integration, or browser test suite identified |
+| CI | Lint and build workflow |
+| Hosting | Vercel rewrite to `index.html` |
+
+## Primary routes
+
+- `/`: landing page.
+- `/create-trip`: collect destination, number of days, budget, and traveler group.
+- `/view-trip/:tripId`: fetch a Firestore trip and render it.
+- `/my-trips`: query trip documents associated with the cached profile email.
+
+## Data flow
+
+The user enters preferences, signs in with Google when no cached profile is present, and the client retrieves a Google profile. The form builds a prompt and sends it to Gemini. Returned text is parsed with JSON.parse and written to Firestore with user selection, trip data, email, and document ID. The application then navigates to the trip detail route. My Trips queries Firestore using the cached profile email.
+
+This is a description of current browser code, not a secure production identity architecture.
+
+## Important known risks
+
+- `VITE_GOOGLE_GEMINI_AI_API_KEY` is used in browser code. Vite embeds VITE variables into browser assets. This key is exposed. Move privileged AI generation behind a server-side function and rotate keys as necessary.
+- Firebase web configuration is hard-coded. It is public client configuration, not access control.
+- localStorage profile values can be forged. They must not authorize Firestore access.
+- The Google OAuth client profile is not shown as a Firebase Authentication session.
+- The reviewed repository tree does not contain Firestore Security Rules. Do not store real user data until rules enforce authenticated ownership.
+- Gemini output is parsed without full schema validation.
+- The form currently has inconsistent duration state spelling and input conversion handling.
+- Error handling for asynchronous provider and database operations is incomplete.
+- The project tracks a large `node_modules/` directory in Git. This should be removed in a deliberate bulk cleanup while retaining `package-lock.json`.
+
+## Documentation maintenance
+
+When routes, environment variables, provider SDKs, data fields, prompt schema, authentication, or deployment settings change, update the affected guides and this index. Mark proposed behavior as planned until it is implemented and verified. Never include real credentials, OAuth tokens, user email addresses, or private travel plans in public examples.
