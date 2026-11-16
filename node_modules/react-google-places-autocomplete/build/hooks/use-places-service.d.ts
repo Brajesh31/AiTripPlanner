@@ -1,0 +1,15 @@
+/// <reference types="google.maps" />
+/// <reference types="react" />
+import { LoaderOptions } from '@googlemaps/js-api-loader';
+declare type UsePlacesServiceArgs = {
+    apiKey?: string;
+    apiOptions?: Partial<LoaderOptions>;
+    onLoadFailed?: (error: Error) => void;
+};
+declare type UsePlacesServiceRes = {
+    placesService?: google.maps.places.AutocompleteService;
+    sessionToken?: google.maps.places.AutocompleteSessionToken;
+    setSessionToken: React.Dispatch<google.maps.places.AutocompleteSessionToken>;
+};
+declare const usePlacesService: (args: UsePlacesServiceArgs) => UsePlacesServiceRes;
+export default usePlacesService;

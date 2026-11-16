@@ -1,0 +1,14 @@
+/// <reference types="google.maps" />
+import { Options } from 'react-select';
+import { AutocompletionRequest } from '../types';
+declare type CBType = (options: Options<any>) => void;
+declare type UseFetchSuggestionsArg = {
+    autocompletionRequest: AutocompletionRequest;
+    debounce: number;
+    minLengthAutocomplete: number;
+    placesService?: google.maps.places.AutocompleteService;
+    sessionToken?: google.maps.places.AutocompleteSessionToken;
+    withSessionToken: boolean;
+};
+declare const useFetchSuggestions: (arg: UseFetchSuggestionsArg) => (value: string, cb: CBType) => void;
+export default useFetchSuggestions;
